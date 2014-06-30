@@ -2,7 +2,7 @@
 	"name": "e-frank/yii2-knockout",
 	"description": "Library to help you build fantastic dynamic forms with server side validation using knockoutjs.",
 	"type": "library",
-	"keywords": "["yii2","library","knockout","lookup","ajax","form"]",
+	"keywords": "['yii2','library','knockout','lookup','ajax','form']",
 	"license": "GPL-3.0+",
 	"authors": [
 		{
