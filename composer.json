@@ -13,7 +13,7 @@
 	],
 	"require": {
 		"php": ">=5.4.0",
-		"ivaynberg/select2": "*",
+		"ivaynberg/select2": "*"
 	},
 	"autoload": {
 		"psr-4": {
