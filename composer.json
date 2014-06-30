@@ -11,6 +11,10 @@
             "homepage": "http://efrank.at"
 		}
 	],
+	"require": {
+		"php": ">=5.4.0",
+		"ivaynberg/select2": "*",
+	},
 	"autoload": {
 		"psr-4": {
 			"efrank\\": ""

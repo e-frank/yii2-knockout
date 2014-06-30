@@ -15,7 +15,7 @@ namespace efrank\assets;
  */
 class KnockoutAsset extends \yii\web\AssetBundle
 {
-	public $sourcePath = '@vendor/efrank/assets/knockout';
+	public $sourcePath = '@vendor/e-frank/yii2-knockout/assets/knockout';
 
 	public $css = [
 	];
