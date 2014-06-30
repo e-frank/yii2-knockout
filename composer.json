@@ -7,7 +7,8 @@
 	"authors": [
 		{
 			"name": "Elmar Frank",
-			"email": "elmar.frank@efrank.at"
+			"email": "elmar.frank@efrank.at",
+            "homepage": "http://efrank.at"
 		}
 	],
 	"autoload": {
