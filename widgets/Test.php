@@ -3,7 +3,7 @@
 namespace efrank\widgets;
 
 
-class ko extends \yii\base\Widget
+class Test extends \yii\base\Widget
 {
 	
 }
