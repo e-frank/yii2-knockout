@@ -22,6 +22,9 @@ class KnockoutAsset extends \yii\web\AssetBundle
 
 	public $js         = [
 		'knockout.js' => 'knockout-3.1.0.js',
+		'knockout.base.js',
+		'knockout.bindinghandlers.js',
+		'knockout.viewmodels.js',
 	];
 
 }
