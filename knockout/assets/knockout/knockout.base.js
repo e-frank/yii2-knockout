@@ -16,10 +16,17 @@ function viewmodelBase() {
 	this.logOptions = function() { console.log (self.options); }
 	this.get 		= function() { 
 		var result = {};
-		$.each(self, function(key, value) {
-			if (ko.isObservable(self[key]))
-				result[key] = self[key]();
-		})
+		if (self._attributes && self._attributes.length > 0) {
+			$.each(self._attributes, function(key, value) {
+				if (ko.isObservable(self[value]))
+					result[value] = self[value]();
+			})
+		} else {
+			$.each(self, function(key, value) {
+				if (ko.isObservable(self[key]))
+					result[key] = self[key]();
+			})
+		}
 		return result;
 	};
 	this.set 		= function(data, errors) { 
@@ -48,9 +55,9 @@ function viewmodelBase() {
 			$('#' + self.options.modal).modal(show);	
 	}
 
-	this.save = function() {
-		if (self.options.save)
-			self.post(self.options.save, self.get(), function(data) {
+	this.update = function() {
+		if (self.options.url)
+			self.post(self.options.url, self.get(), function(data) {
 				if (self.options.grid)
 					baseViewModel.pjax(self.options.grid);
 				if (data.error == false) {
@@ -80,7 +87,7 @@ function viewmodelBase() {
 			$('#' + self.options.form).on('submit', function(event, data) {
 				event.preventDefault();
 				console.log('captured form submit');
-				self.save();
+				self.update();
 				return false;
 			});
 		}

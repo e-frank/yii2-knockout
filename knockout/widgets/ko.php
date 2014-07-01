@@ -8,7 +8,7 @@ use yii\helpers\Url;
 use yii\helpers\ArrayHelper;
 
 
-class koViewmodel extends \yii\base\Widget
+class ko extends \yii\base\Widget
 {
 	
 	public $name = 'viewmodel';
@@ -116,7 +116,7 @@ class koViewmodel extends \yii\base\Widget
 	}
 
 
-	public static function viewmodel($model, $params = []) {
+	public static function model($model, $params = []) {
 		$class  = self::get_real_class($model);
 		$lines  = array();
 
@@ -135,7 +135,14 @@ class koViewmodel extends \yii\base\Widget
 		$lines[] = "\tthis.prototype = new viewmodelBase();";
 		$lines[] = "\tviewmodelBase.call(this);";
 		$lines[] = "\tvar self = this;";
-		$lines[] = sprintf("\tthis.classname = %s;\r\n", json_encode($class));
+		$lines[] = sprintf("\tthis._classname = %s;\r\n", json_encode($class));
+
+		if (array_key_exists('attributes', $params)) {
+			$lines[] = sprintf("\tthis._attributes = %s;\r\n", json_encode($params['attributes']));
+		} else {
+			$lines[] = sprintf("\tthis._attributes = [];\r\n");
+		}
+
 		$lines[] = "\tobj = obj || {};";
 		// $lines[] = sprintf("\tthis.setOptions($.extend(options || {}, this.options, %s));\r\n", json_encode($options, JSON_PRETTY_PRINT || JSON_FORCE_OBJECT));
 		$lines[] = sprintf("\tthis.options = $.extend(this.options || {}, options, %s);\r\n", json_encode($options, JSON_PRETTY_PRINT || JSON_FORCE_OBJECT));
@@ -171,7 +178,7 @@ class koViewmodel extends \yii\base\Widget
 		if ($this->model instanceof \yii\base\Model) {
 			// print "model found";
 		}
-		return $this::viewmodel($this->model, []);
+		return $this::model($this->model, []);
 		return 'run widget ZZZZZZ';
 	}
 }
