@@ -1,5 +1,5 @@
 <?
-namespace app\widgets;
+namespace efrank\knockout\widgets;
 
 use Yii;
 use yii\property\InvalidConfigException;
@@ -8,7 +8,7 @@ use yii\helpers\Url;
 use yii\helpers\ArrayHelper;
 
 
-class ko extends \yii\base\Widget
+class koViewmodel extends \yii\base\Widget
 {
 	
 	public $viewmodel;

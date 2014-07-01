@@ -5,7 +5,7 @@
  * @license http://www.yiiframework.com/license/
  */
 
-namespace efrank\assets;
+namespace efrank\knockout\assets;
 
 /**
  * This asset bundle provides the base javascript files for the Yii Framework.

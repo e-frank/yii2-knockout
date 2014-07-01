@@ -1,7 +1,7 @@
 {
 	var _n_ = ((1234.5).toLocaleString());
     ko.extenders.thousandsSeperator = _n_.toLocaleString().substring(1, 2);
-    ko.extenders.decimalSeperator = _n_.toLocaleString().substring(5, 6);
+    ko.extenders.decimalSeperator   = _n_.toLocaleString().substring(5, 6);
 }
 
 
