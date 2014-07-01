@@ -1,6 +1,6 @@
 <?php
 
-namespace efrank;
+namespace efrank\knockout;
 
 class AutoloadExample extends \yii\base\Widget
 {
