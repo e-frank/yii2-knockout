@@ -1,4 +1,4 @@
-ko.exteders.hours = [
+ko.extenders.hours = [
 					{	key:	00,	value:	'00'},
 					{	key:	01,	value:	'01'},
 					{	key:	02,	value:	'02'},
