@@ -1,5 +1,5 @@
 <?
-namespace efrank\knockout;
+namespace efrank\knockout\widgets;
 
 use Yii;
 use yii\property\InvalidConfigException;
