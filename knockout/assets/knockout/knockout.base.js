@@ -10,7 +10,6 @@ function viewmodelBase() {
 
 	var self 		= this;
 	this.options    = {};
-	// this.assign     = function(o) { self.instance = o; }
 	this.setOptions = function(o) { self.options = o; }
 
 	this.logOptions = function() { console.log (self.options); }
@@ -18,7 +17,7 @@ function viewmodelBase() {
 		var result = {};
 		if (self._attributes && self._attributes.length > 0) {
 			$.each(self._attributes, function(key, value) {
-				if (ko.isObservable(self[value])) {
+				if (ko.isWriteableObservable(self[value])) {
 					if (self[value].get)
 						result[value] = self[value].get();
 					else
@@ -27,7 +26,7 @@ function viewmodelBase() {
 			})
 		} else {
 			$.each(self, function(key, value) {
-				if (ko.isObservable(self[key]))
+				if (ko.isWriteableObservable(self[key]))
 					result[key] = self[key]();
 			})
 		}
@@ -44,7 +43,7 @@ function viewmodelBase() {
 			$.each(self._attributes, function(key, value) {
 				var p = self[value];
 				d = data ? data[value] : null;
-				if (ko.isObservable(p)) {
+				if (ko.isWriteableObservable(p)) {
 					p.set ? p.set(d) : p(d);
 					p.errors ? p.errors([]) : null;
 				}
@@ -52,7 +51,7 @@ function viewmodelBase() {
 		} else {
 			$.each(data, function(key, value) {
 				var p = self[key];
-				if (ko.isObservable(p)) {
+				if (ko.isWriteableObservable(p)) {
 					p.set ? p.set(value) : p(value);
 					p.errors ? p.errors([]) : null;
 				}
@@ -72,13 +71,19 @@ function viewmodelBase() {
 			$('#' + self.options.modal).modal(show);	
 	}
 
-	this.update = function() {
+	this.update = function(callback) {
 		if (self.options.url)
 			self.post(self.options.url, self.getModel(), function(data) {
 				if (self.options.grid)
 					baseViewModel.pjax(self.options.grid);
-				if (data.error == false) {
+				if (((data.errors && data.errors.length == 0) || (!data.errors))) {
 					self.modal('hide');
+					var ok = true;
+					if (callback)
+						ok = callback(data) || true;
+					if (ok && self.options.redirect) {
+						window.location.href = options.redirect;
+					}
 				}
 			});
 	}

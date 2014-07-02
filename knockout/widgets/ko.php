@@ -103,6 +103,16 @@ class ko extends \yii\base\Widget
 			$attributes = array_diff_key($attributes, array_flip($params['remove']));
 		}
 		$extenders = array_intersect_key($params['extenders'], $attributes);
+		
+		if (array_key_exists('key', $params)) {
+			$key = $params['key'];
+			foreach ($key as $key => $value) {
+				$attributes[$value] = ['name' => $value];
+				$extenders[$value] = [];
+			}
+		} else {
+			$key = [];
+		}
 
 
 
@@ -138,12 +148,14 @@ class ko extends \yii\base\Widget
 			foreach ($components as $key => $value) {
 				$p = array_key_exists('prefix', $value) ? $value['prefix'] : self::PREFIX;
 				$e = [];
+				$ex = '';
 				if ($n = self::getName($value)) {
 					if (array_key_exists($n, $extenders))
 						$e = $extenders[$n];
 					else
 						$e = [];
-					$e['component'] = ['viewmodel' => $p . $n];
+					// $e['component'] = ['viewmodel' => $p . $n];
+					$ex = sprintf('component:{ viewmodel:%s, parent: self, key: %s }', $p.$n, json_encode($value['key']));
 
 					if (!in_array($p . $n, $viewmodels)) {
 						$viewmodels[] = $p . $n;
@@ -158,7 +170,8 @@ class ko extends \yii\base\Widget
 				}
 
 				$attributes[$value['attribute']]  = ['name' => $value['attribute']];
-				$lines[] = "\t" .sprintf('this.%1$s = ko.observable(%3$s).extend(%2$s);', $value['attribute'], json_encode($e, JSON_PRETTY_PRINT || JSON_FORCE_OBJECT), $new);
+				$ext = substr_replace(json_encode($e, JSON_PRETTY_PRINT | JSON_FORCE_OBJECT), $ex, 1, 0);
+				$lines[] = "\t" .sprintf('this.%1$s = ko.observable(%3$s).extend(%2$s);', $value['attribute'], $ext, $new);
 
 			}
 		} else {
@@ -173,18 +186,21 @@ class ko extends \yii\base\Widget
 				$lines[] = '// ' . serialize($value);
 				$e = [];
 				$p = array_key_exists('prefix', $value) ? $value['prefix'] : self::PREFIX;
+				$ex = '';
 				if ($n = self::getName($value)) {
-					$e['list'] = ['viewmodel' => $p . $n];
+					// $e['list'] = ['viewmodel' => $p . $n];
+					$ex = sprintf('list:{ viewmodel:%s, parent: self, key: %s }', $p.$n, json_encode($value['key']));
 
 					if (!in_array($p . $n, $viewmodels)) {
 						$viewmodels[] = $p . $n;
 						$lists_ .= self::viewmodel($value, $viewmodels);
 					}
 				} else {
-					$e['list'] = null;
+					$e['list'] = true;
 				}
 				$attributes[$value['attribute']]  = ['name' => $value['attribute']];
-				$lines[] = "\t" .sprintf('this.%1$s = ko.observableArray().extend(%2$s);', $value['attribute'], json_encode($e, JSON_PRETTY_PRINT || JSON_FORCE_OBJECT));
+				$ext = substr_replace(json_encode($e, JSON_PRETTY_PRINT | JSON_FORCE_OBJECT), $ex, 1, 0);
+				$lines[] = "\t" .sprintf('this.%1$s = ko.observableArray().extend(%2$s);', $value['attribute'], $ext);
 
 			}
 		}
