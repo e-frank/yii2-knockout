@@ -11,8 +11,6 @@ use yii\helpers\ArrayHelper;
 class koViewmodel extends \yii\base\Widget
 {
 	
-	public $name = 'viewmodel';
-	public $model;
 	public $viewmodel;
 	private static $labels = [];
 	private $models        = [];
@@ -122,19 +120,15 @@ class koViewmodel extends \yii\base\Widget
 
 		$options = array_key_exists('options', $params) ? $params['options'] : [];
 		if (!array_key_exists('key', $options)) {
-			if (method_exists($model, 'primaryKey')) {
-				$pk = $model->primaryKey();
-				$options['key'] = $pk;
-			} else {
-
-			}
+			$pk = $model->primaryKey();
+			$options['key'] = $pk;
 		}
 
 		$lines[] = '';
 		$lines[] = sprintf('function viewmodel%s(obj, options) {', $class);
-		$lines[] = "\tthis.prototype = new viewmodelBase();";
-		$lines[] = "\tviewmodelBase.call(this);";
+		$lines[] = "\tviewmodelExtension.call(this);";
 		$lines[] = "\tvar self = this;";
+		$lines[] = "\t//this.assign(this);\r\n";
 		$lines[] = sprintf("\tthis.classname = %s;\r\n", json_encode($class));
 		$lines[] = "\tobj = obj || {};";
 		// $lines[] = sprintf("\tthis.setOptions($.extend(options || {}, this.options, %s));\r\n", json_encode($options, JSON_PRETTY_PRINT || JSON_FORCE_OBJECT));
@@ -151,6 +145,7 @@ class koViewmodel extends \yii\base\Widget
 		$lines[] = "\tthis.set(obj);";
 		$lines[] = "\tthis.finish();";
 		$lines[] = '}';
+		$lines[] = sprintf('viewmodel%s.prototype = new viewmodelExtension();', $class);
 		$lines[] = '';
 		$lines[] = '';
 		return implode("\r\n", $lines);
@@ -168,10 +163,7 @@ class koViewmodel extends \yii\base\Widget
 	}
 
 	public function run() {
-		if ($this->model instanceof \yii\base\Model) {
-			// print "model found";
-		}
-		return $this::viewmodel($this->model, []);
+
 		return 'run widget ZZZZZZ';
 	}
 }

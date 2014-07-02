@@ -10,12 +10,16 @@ use yii\helpers\ArrayHelper;
 
 class ko extends \yii\base\Widget
 {
-	
-	public $name = 'viewmodel';
-	public $model;
-	public $viewmodel;
+	const PREFIX      = 'viewmodel';
+	public $prefix    = self::PREFIX;
+	public $model     = null;
+	public $viewmodel = null;
+	public $bind      = true;
+
 	private static $labels = [];
 	private $models        = [];
+	private $config        = [];
+
 
 	private static function get_real_class($obj) {
 		$classname = get_class($obj);
@@ -29,7 +33,7 @@ class ko extends \yii\base\Widget
 
 	public function render($view, $params = [])
 	{
-		$this->viewmodel = $params;
+		$this->config = $params;
 		// $view  = $this->getView();
 
 		// $view  = $this->getView();
@@ -67,7 +71,7 @@ class ko extends \yii\base\Widget
 	}
 
 
-	public static function vm($params = []) {
+	public static function vm2($params = []) {
 
 		$name      = array_key_exists('name', $params) ? $params['name'] : 'undefinedViewModelName';
 		$models    = array_key_exists('models', $params) ? $params['models'] : [];
@@ -116,11 +120,180 @@ class ko extends \yii\base\Widget
 	}
 
 
-	public static function model($model, $params = []) {
+	private static function getName($params) {
+		if (array_key_exists('name', $params)) {
+			return $params['name'];
+		} elseif (array_key_exists('model', $params)) {
+			return self::get_real_class($params['model']);
+		} elseif (array_key_exists('class', $params)) {
+			return basename($params['class']);
+		}
+		return false;
+	}
+
+	public static function viewmodel($params, $viewmodels = []) {
+		if (!is_array($params) && $params instanceof \yii\base\Model)  {
+			$params = self::fromModel($params);
+		}
+
+		$hasModel = array_key_exists('model', $params);
+		if (!$hasModel && array_key_exists('class', $params)) {
+			$params['model'] = new $$params['class'];
+			$hasModel        = true;
+		}
+
+		if ($hasModel) {
+			$params = array_merge($params, self::fromModel($params['model'], $params));
+		}
+
+		if (!array_key_exists('name', $params)) {
+			throw new \yii\base\InvalidConfigException('viewmodel "name" not set');
+		}
+
+		if (!array_key_exists('attributes', $params)) {
+			return '';
+			// throw new \yii\base\InvalidConfigException('viewmodel "attributes" not set');
+		}
+
+		$name   = $params['name'];
+		$class  = (array_key_exists('class', $params)) ? $params['class'] : (array_key_exists('model', $params) ? get_class($params['model']) : '');
+		$prefix = array_key_exists('prefix', $params) ? $params['prefix'] : self::PREFIX;
+		// if (array_key_exists('remove', $params))
+		// 	$attr = array_values(array_diff($params['attributes'], $params['remove']));
+		// else
+
+		if (!array_key_exists('extenders', $params))
+			$params['extenders'] = [];
+
+		if (array_key_exists('attributes', $params))
+			$attr = $params['attributes'];
+		else
+			$attr = [];
+
+		$attributes = array();
+		foreach ($attr as $key => $value) {
+			if (is_array($value)) {
+				if (array_key_exists('model', $value)) {
+					$value['name']  = self::get_real_class($model);
+					$value['class'] = get_class($model);
+				}
+				$attributes[$key] = $value;
+			} else {
+				$attributes[$value]['name'] = $value;
+			}
+		}
+		if (array_key_exists('extensions', $params)) {
+
+		}
+
+		// remove unwanted
+		if (array_key_exists('remove', $params)) {
+			$attributes = array_diff_key($attributes, array_flip($params['remove']));
+		}
+		$extenders = array_intersect_key($params['extenders'], $attributes);
+
+
+
+		$lines      = array();
+
+		$options = array_key_exists('options', $params) ? $params['options'] : [];
+
+		$lines[] = '';
+		$lines[] = sprintf('function %s%s(obj, options) {', $prefix, $name);
+		$lines[] = "\tthis.prototype = new viewmodelBase();";
+		$lines[] = "\tviewmodelBase.call(this);";
+		$lines[] = "\tvar self = this;";
+		$lines[] = sprintf("\tthis._name       = %s;", json_encode($name));
+		$lines[] = sprintf("\tthis._class      = %s;", json_encode($class));
+
+		$lines[] = "\tobj = obj || {};";
+		$lines[] = sprintf("\tthis.options = $.extend(this.options || {}, options, %s);\r\n", json_encode($options, JSON_PRETTY_PRINT || JSON_FORCE_OBJECT));
+
+		foreach ($attributes as $key => $value) {
+			if (array_key_exists($value['name'], $extenders))
+				$e = $extenders[$value['name']];
+			else
+				$e = [];
+			$e['errors'] = true;
+			$lines[] = "\t" .sprintf('this.%1$s = ko.observable().extend(%2$s);', $value['name'], json_encode($e, JSON_PRETTY_PRINT || JSON_FORCE_OBJECT));
+		}
+
+
+		// components
+		$components_ = '';
+		if (array_key_exists('components', $params)) {
+			$components = $params['components'];
+			foreach ($components as $key => $value) {
+				$p = array_key_exists('prefix', $value) ? $value['prefix'] : self::PREFIX;
+				$e = [];
+				if ($n = self::getName($value)) {
+					if (array_key_exists($n, $extenders))
+						$e = $extenders[$n];
+					else
+						$e = [];
+					$e['component'] = $p . $n;
+
+					if (!in_array($n, $viewmodels)) {
+						$viewmodels[] = $n;
+						$components_ .= self::viewmodel($value, $viewmodels);
+					}
+
+					$new = sprintf('new %s%s()', $p, $n);
+
+				} else {
+					$e['component'] = true;
+					$new = '';
+				}
+
+				$attributes[$value['attribute']]  = ['name' => $value['attribute']];
+				$lines[] = "\t" .sprintf('this.%1$s = ko.observable(%3$s).extend(%2$s);', $value['attribute'], json_encode($e, JSON_PRETTY_PRINT || JSON_FORCE_OBJECT), $new);
+
+			}
+		} else {
+			$components = [];
+		}
+
+
+		// relations
+		$relations_ = '';
+		if (array_key_exists('relations', $params)) {
+			foreach ($params['relations'] as $key => $value) {
+				$e = [];
+				if (array_key_exists('name', $value)) {
+					$n             = $value['name'];
+					$p = array_key_exists('prefix', $value) ? $value['prefix'] : self::PREFIX;
+					$e['list'] = $p . $value['name'];
+
+					if (!in_array($n, $viewmodels)) {
+						$viewmodels[] = $n;
+						$relations_ .= self::viewmodel($value, $viewmodels);
+					}
+				} else {
+					$e['list'] = null;
+				}
+				$attributes[$value['attribute']]  = ['name' => $value['attribute']];
+				$lines[] = "\t" .sprintf('this.%1$s = ko.observableArray().extend(%2$s);', $value['attribute'], json_encode($e, JSON_PRETTY_PRINT || JSON_FORCE_OBJECT));
+
+			}
+		}
+
+		$lines[] = sprintf("\tthis._attributes = %s;\r\n", json_encode(array_keys($attributes)));
+
+
+		$lines[] = "\tthis.set(obj);";
+		$lines[] = "\tthis.finish();";
+		$lines[] = '}';
+		$lines[] = '';
+		$lines[] = '';
+		return $components_ . "\r\n" . $relations_ . "\r\n" . implode("\r\n", $lines);
+	}
+
+	public static function fromModel($model, $params = []) {
 		$class  = self::get_real_class($model);
 		$lines  = array();
 
 		$options = array_key_exists('options', $params) ? $params['options'] : [];
+		
 		if (!array_key_exists('key', $options)) {
 			if (method_exists($model, 'primaryKey')) {
 				$pk = $model->primaryKey();
@@ -130,37 +303,47 @@ class ko extends \yii\base\Widget
 			}
 		}
 
-		$lines[] = '';
-		$lines[] = sprintf('function viewmodel%s(obj, options) {', $class);
-		$lines[] = "\tthis.prototype = new viewmodelBase();";
-		$lines[] = "\tviewmodelBase.call(this);";
-		$lines[] = "\tvar self = this;";
-		$lines[] = sprintf("\tthis._classname = %s;\r\n", json_encode($class));
-
 		if (array_key_exists('attributes', $params)) {
-			$lines[] = sprintf("\tthis._attributes = %s;\r\n", json_encode($params['attributes']));
+			$attributes = $params['attributes'];
 		} else {
-			$lines[] = sprintf("\tthis._attributes = [];\r\n");
+			$attributes = array_keys($model->getAttributes());
 		}
 
-		$lines[] = "\tobj = obj || {};";
-		// $lines[] = sprintf("\tthis.setOptions($.extend(options || {}, this.options, %s));\r\n", json_encode($options, JSON_PRETTY_PRINT || JSON_FORCE_OBJECT));
-		$lines[] = sprintf("\tthis.options = $.extend(this.options || {}, options, %s);\r\n", json_encode($options, JSON_PRETTY_PRINT || JSON_FORCE_OBJECT));
+		if (array_key_exists('extenders', $params))
+			$extenders = $params['extenders'];
+		else
+			$extenders = [];
+		if (method_exists($model, 'getTableSchema')) {
 
-		$attrs = $model->getAttributes();
-		foreach ($attrs as $key => $value) {
-			$lines[] = "\t" .sprintf('this.%1$s = ko.observable().extend({ errors: true });', $key);
-			
-			// $lines[] = "\t" .sprintf('this.%1$s.errors = ko.observableArray();', $key);
-			// $lines[] = "\t" .sprintf('this.%1$s.hasError = ko.computed(function() { return this.%1$s.errors().length > 0; }, this);', $key);
+			$columns = $model->getTableSchema()->columns;
+			foreach ($attributes as $key => $value) {
+				if (!array_key_exists($value, $extenders)) {
+					switch($columns[$value]->type) {
+						case 'integer':
+							$extenders[$value]['decimal'] = ['decimals' => 0];
+							break;
+						case 'decimal':
+							preg_match('|^decimal\(\d+,(\d+)\)$|i', $columns[$value]->dbType, $matches);
+							$extenders[$value]['decimal'] = ['decimals' => $matches[1]];
+							break;
+						case 'date':
+							$extenders[$value]['date'] = (object)[];
+							break;
+						case 'datetime':
+							$extenders[$value]['datetime'] = (object)[];
+							break;
+					}
+				}
+			}
 		}
 
-		$lines[] = "\tthis.set(obj);";
-		$lines[] = "\tthis.finish();";
-		$lines[] = '}';
-		$lines[] = '';
-		$lines[] = '';
-		return implode("\r\n", $lines);
+		if (!array_key_exists('extenders', $params))
+			$params['extenders'] = [];
+
+		$result              = array_merge(['name' => $class, 'attributes' => $attributes], $params);
+		$result['extenders'] = array_merge($extenders, $params['extenders']);
+		$result['model']     = $model;
+		return $result;
 	}
 
 	public static function vmReady($params = []) {
@@ -175,10 +358,19 @@ class ko extends \yii\base\Widget
 	}
 
 	public function run() {
-		if ($this->model instanceof \yii\base\Model) {
-			// print "model found";
+		if (isset($this->viewmodel)) {
+			$this->getView()->registerJs($this::viewmodel($this->viewmodel), \yii\web\View::POS_END);
+		} elseif (isset($this->model)) {
+			$this->getView()->registerJs($this::viewmodel($this->model), \yii\web\View::POS_END);
 		}
-		return $this::model($this->model, []);
-		return 'run widget ZZZZZZ';
+		if ($this->bind) {
+			$p = array_key_exists('prefix', $this->viewmodel) ? $this->viewmodel['prefix'] : $this::PREFIX;
+			$t = '';
+			if ($this->bind !== true) {
+				$t = sprintf(', document.getElementById(\'%s\')', $this->bind);
+			}
+			$this->getView()->registerJs(sprintf('ko.applyBindings(new %s%s()%s);', $p, $this::getName($this->viewmodel), $t) , \yii\web\View::POS_READY);
+		}
+		return;
 	}
 }
