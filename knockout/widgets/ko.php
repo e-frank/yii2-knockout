@@ -231,7 +231,7 @@ class ko extends \yii\base\Widget
 						$e = $extenders[$n];
 					else
 						$e = [];
-					$e['component'] = $p . $n;
+					$e['component'] = ['viewmodel' => $p . $n];
 
 					if (!in_array($n, $viewmodels)) {
 						$viewmodels[] = $n;
@@ -242,7 +242,7 @@ class ko extends \yii\base\Widget
 
 				} else {
 					$e['component'] = true;
-					$new = '';
+					$new = '{}';
 				}
 
 				$attributes[$value['attribute']]  = ['name' => $value['attribute']];

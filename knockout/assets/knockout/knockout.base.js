@@ -18,8 +18,12 @@ function viewmodelBase() {
 		var result = {};
 		if (self._attributes && self._attributes.length > 0) {
 			$.each(self._attributes, function(key, value) {
-				if (ko.isObservable(self[value]))
-					result[value] = self[value]();
+				if (ko.isObservable(self[value])) {
+					if (self[value].get)
+						result[value] = self[value].get();
+					else
+						result[value] = self[value]();
+				}
 			})
 		} else {
 			$.each(self, function(key, value) {
@@ -29,12 +33,20 @@ function viewmodelBase() {
 		}
 		return result;
 	};
+	this.getModel	= function() {
+		var o = {};
+		o[self._name] = self.get();
+		return o;
+	}
 	this.set 		= function(data, errors) { 
 
 		$.each(data, function(key, value) {
 			var p = self[key];
 			if (ko.isObservable(p)) {
-				p(value);
+				if (p.set)
+					p.set(value);
+				else
+					p(value);
 				// console.log('set2 ', key, value, p());
 				if (p.errors)
 					p.errors([]);
