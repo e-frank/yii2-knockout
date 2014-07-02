@@ -88,18 +88,18 @@ ko.extenders.decimal = function (target, options) {
 	//	default options
 	options	=	$.extend({
 		decimals:           2,
-		decimalSeperator:   null,
-		thousandsSeperator: null,
+		decimalSeperator:   ko.extenders.decimalSeperator,
+		thousandsSeperator: ko.extenders.thousandsSeperator,
 		null:               true
 	}, options);
 	
-	if (options.thousandsSeperator == null) {
-		options.thousandsSeperator = ko.extenders.thousandsSeperator;
-	}
+	// if (options.thousandsSeperator == null) {
+	// 	options.thousandsSeperator = ko.extenders.thousandsSeperator;
+	// }
 
-	if (options.decimalSeperator == null) {
-		options.decimalSeperator = ko.extenders.decimalSeperator;
-	}
+	// if (options.decimalSeperator == null) {
+	// 	options.decimalSeperator = ko.extenders.decimalSeperator;
+	// }
 
 	target.decimal = ko.computed({
 		owner: this,

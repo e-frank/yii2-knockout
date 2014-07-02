@@ -241,3 +241,159 @@ ko.extenders.datetime = function (target, options) {
 	
 	return target;
 }
+
+
+
+ko.extenders.datetime = function (target, options) {
+
+	//	default options
+	options	=	$.extend({
+		utc		:	false,
+		date	:	true,
+		datetime:	false,
+		year	:	false,
+		month	:	false,
+		day		:	false,
+		hour	:	false,
+		minute	:	false,
+		time	:	false,
+		round	:	false,
+		format  :   'YYYY-MM-DD',
+		null	:	true
+	}, options);
+	
+	//	moment display format
+	var date_db        = 'YYYY-MM-DD HH:mm:ss';
+	
+
+	// get moment and choose UTC or LOCAL
+	function getMoment(t) {
+		var result = null;
+		if (t && t != null && t != '') {
+			var m = ((options.utc == true) ? moment.utc(t, date_db).local() : moment(t, date_db));
+			
+			//	round to quarters
+			if (options.round && m && m.isValid()) {
+				m.minute( m.minute() - m.minute() % 15);
+				m.second(0);
+			}
+			
+			result = m;
+		}
+		return result;
+	}
+	
+
+	target.moment	=	ko.computed({
+		owner	:	target,
+		read	:	function() {
+			var	t	=	target();
+			return getMoment(t);
+		},
+		write	:	function (v) {
+			if (v && v.isValid()) {
+				target(v.format(date_db));
+			}
+		}
+	});
+	
+
+	target.date		=	ko.computed({
+		owner	:	target,
+		read	:	function() {
+			var m = target.moment();
+			if (m != null)
+				return m.format(options.format);
+			else
+				return '';
+		},
+		write	:	function(v) {
+			if (v && v != null && v != '') {
+				var i	=	parseInt(v);
+
+							//	smart date
+							if (i == v)
+								var m	=	moment().add('days', v);
+							else
+								var m	=	moment(v, options.format);
+
+							//	round to quarters
+							if (options.round && m && m.isValid()) {
+								m.minute( m.minute() - m.minute() % 15);
+								m.second(0);
+							}
+							
+							n = target.moment();
+							if (n != null) {
+								n.year(m.year());
+								n.month(m.month());
+								n.date(m.date());
+							} else
+							n = m;
+
+							target(n.format(date_db));
+						}
+						else
+							target(null);
+					}
+				});
+	
+	target.year	=	ko.computed({
+		owner	:	target,
+		read	:	function() {
+			var m = target.moment();
+			if (m != null)
+				return m.year();
+			else
+				return '';
+		},
+		write	:	function(v) {
+			if (v != undefined && v !== null && v !== '') {
+				var m = target.moment();
+				if (m == null)
+				{
+					m = moment();
+					m.seconds(0);
+				}
+				m.year(v);
+				target(m.format(date_db));
+			} else
+			target(null);
+		}
+	});
+
+	target.month	=	ko.computed({
+		owner	:	target,
+		read	:	function() {
+			var m = target.moment();
+			if (m != null)
+				return m.month() + 1;
+			else
+				return '';
+		},
+		write	:	function(v) {
+			if (v != undefined && v !== null && v !== '') {
+				var m = target.moment();
+				if (m == null)
+				{
+					m = moment();
+					m.seconds(0);
+				}
+				m.month(v - 1);
+				target(m.format(date_db));
+			} else
+			target(null);
+		}
+	});
+	
+
+	target.current = function() {
+		target(getMoment(moment().format(date_db)).format(date_db));
+	}
+	
+	target.clear = function() {
+		target(null);
+	}
+	
+	return target;
+}

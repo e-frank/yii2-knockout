@@ -31,7 +31,7 @@ class ko extends \yii\base\Widget
 		return $classname;
 	}
 
-	public function render($view, $params = [])
+	public function render222($view, $params = [])
 	{
 		$this->config = $params;
 		// $view  = $this->getView();
@@ -62,64 +62,6 @@ class ko extends \yii\base\Widget
 	}	
 
 
-	public static function collection($params) {
-		$name = array_key_exists('name', $params) ? $params['name'] : 'undefinedCollectionName';
-		$output = '';
-		$output .= sprintf('// collection %s', $name);
-
-		return $output;
-	}
-
-
-	public static function vm2($params = []) {
-
-		$name      = array_key_exists('name', $params) ? $params['name'] : 'undefinedViewModelName';
-		$models    = array_key_exists('models', $params) ? $params['models'] : [];
-		$relations = array_key_exists('relations', $params) ? $params['relations'] : [];
-		$output    = '';
-
-		$lines  = array();
-		$lines[] = sprintf('function %s(obj) {', $name);
-		$lines[] = sprintf('var self = this;', $name);
-		$lines[] = sprintf('// viewmodel %s', $name);
-
-		foreach ($relations as $key => $relation) {
-			$lines[] = '// relations';
-
-			foreach ($relation['keys'] as $key => $value) {
-				// $lines[] = sprintf('this.%1$s = new viewmodel%1$s();', $key);
-			}
-
-		}
-
-		$first = true;
-		$firstName = '';
-		foreach ($models as $key => $value) {
-			$property   = array_key_exists('property', $value) ? $value['property'] : 'undefinedPropertyName';
-			if ($first) {
-				$firstName = $property;
-				$first = false;
-			}
-			$class   = array_key_exists('class', $value) ? $value['class'] : 'viewmodel'.$property;
-			$list    = array_key_exists('list', $value) ? $value['list'] : false;
-			$raw     = array_key_exists('raw', $value) ? $value['raw'] : false;
-			$options = array_key_exists('options', $value) ? $value['options'] : [];
-			$lines[] = sprintf('this.%1$s = new %2$s(undefined, %3$s);', $property, $class, json_encode($options, JSON_FORCE_OBJECT));
-			$lines[] = sprintf('console.log(this.%1$s.options);', $property, $class, json_encode($options));
-			if ($list) {
-				$lines[] = sprintf('this.%1$sList = ko.observableArray().extend({ list: { %3$stargetProperty: self.%2$s }});', $property, $property, ($raw) ? '' : 'viewmodel: '.$class.',' );
-			}
-		}
-
-		$lines[] = sprintf('this.%1$s.set(obj);', $firstName);
-
-		$lines[] = '}';
-		$lines[] = '';
-		$lines[] = '';
-		return implode("\r\n", $lines);
-	}
-
-
 	private static function getName($params) {
 		if (array_key_exists('name', $params)) {
 			return $params['name'];
@@ -138,7 +80,7 @@ class ko extends \yii\base\Widget
 
 		$hasModel = array_key_exists('model', $params);
 		if (!$hasModel && array_key_exists('class', $params)) {
-			$params['model'] = new $$params['class'];
+			$params['model'] = new $params['class'];
 			$hasModel        = true;
 		}
 
@@ -233,8 +175,8 @@ class ko extends \yii\base\Widget
 						$e = [];
 					$e['component'] = ['viewmodel' => $p . $n];
 
-					if (!in_array($n, $viewmodels)) {
-						$viewmodels[] = $n;
+					if (!in_array($p . $n, $viewmodels)) {
+						$viewmodels[] = $p . $n;
 						$components_ .= self::viewmodel($value, $viewmodels);
 					}
 
@@ -254,19 +196,19 @@ class ko extends \yii\base\Widget
 		}
 
 
-		// relations
-		$relations_ = '';
-		if (array_key_exists('relations', $params)) {
-			foreach ($params['relations'] as $key => $value) {
+		// lists
+		$lists_ = '';
+		if (array_key_exists('lists', $params)) {
+			foreach ($params['lists'] as $key => $value) {
+				$lines[] = '// ' . serialize($value);
 				$e = [];
-				if (array_key_exists('name', $value)) {
-					$n             = $value['name'];
-					$p = array_key_exists('prefix', $value) ? $value['prefix'] : self::PREFIX;
-					$e['list'] = $p . $value['name'];
+				$p = array_key_exists('prefix', $value) ? $value['prefix'] : self::PREFIX;
+				if ($n = self::getName($value)) {
+					$e['list'] = ['viewmodel' => $p . $n];
 
-					if (!in_array($n, $viewmodels)) {
-						$viewmodels[] = $n;
-						$relations_ .= self::viewmodel($value, $viewmodels);
+					if (!in_array($p . $n, $viewmodels)) {
+						$viewmodels[] = $p . $n;
+						$lists_ .= self::viewmodel($value, $viewmodels);
 					}
 				} else {
 					$e['list'] = null;
@@ -279,14 +221,22 @@ class ko extends \yii\base\Widget
 
 		$lines[] = sprintf("\tthis._attributes = %s;\r\n", json_encode(array_keys($attributes)));
 
+		if (array_key_exists('code', $params)) {
+			$code = $params['code'];
+			if (is_array($code)) 
+				$lines[] = implode("\r\n", $code);
+			else
+				$lines[] = $code;
+		}
 
 		$lines[] = "\tthis.set(obj);";
 		$lines[] = "\tthis.finish();";
 		$lines[] = '}';
 		$lines[] = '';
 		$lines[] = '';
-		return $components_ . "\r\n" . $relations_ . "\r\n" . implode("\r\n", $lines);
+		return $components_ . "\r\n" . $lists_ . "\r\n" . implode("\r\n", $lines);
 	}
+
 
 	public static function fromModel($model, $params = []) {
 		$class  = self::get_real_class($model);
@@ -346,16 +296,6 @@ class ko extends \yii\base\Widget
 		return $result;
 	}
 
-	public static function vmReady($params = []) {
-		$lines[] = '';
-		$lines[] = sprintf('function cccXXXXXX(obj) {');
-		$lines[] = "\tvar self = this;";
-		$lines[] = '}';
-		$lines[] = '';
-		$lines[] = '';
-		return implode("\r\n", $lines);
-
-	}
 
 	public function run() {
 		if (isset($this->viewmodel)) {

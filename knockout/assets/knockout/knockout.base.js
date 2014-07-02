@@ -40,23 +40,28 @@ function viewmodelBase() {
 	}
 	this.set 		= function(data, errors) { 
 
-		$.each(data, function(key, value) {
-			var p = self[key];
-			if (ko.isObservable(p)) {
-				if (p.set)
-					p.set(value);
-				else
-					p(value);
-				// console.log('set2 ', key, value, p());
-				if (p.errors)
-					p.errors([]);
-			}
-		})
+		if (self._attributes) {
+			$.each(self._attributes, function(key, value) {
+				var p = self[value];
+				d = data ? data[value] : null;
+				if (ko.isObservable(p)) {
+					p.set ? p.set(d) : p(d);
+					p.errors ? p.errors([]) : null;
+				}
+			})
+		} else {
+			$.each(data, function(key, value) {
+				var p = self[key];
+				if (ko.isObservable(p)) {
+					p.set ? p.set(value) : p(value);
+					p.errors ? p.errors([]) : null;
+				}
+			})
+		}
 		errors = errors || [];
 		$.each(errors, function(key, value) {
 			var p = self[key];
-			if (p.errors)
-				p.errors(value);
+			p.errors ? p.errors(value) : null;
 		});
 		return self;
 	};
@@ -69,7 +74,7 @@ function viewmodelBase() {
 
 	this.update = function() {
 		if (self.options.url)
-			self.post(self.options.url, self.get(), function(data) {
+			self.post(self.options.url, self.getModel(), function(data) {
 				if (self.options.grid)
 					baseViewModel.pjax(self.options.grid);
 				if (data.error == false) {
