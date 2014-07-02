@@ -17,12 +17,10 @@ ko.extenders.list = function (target, options) {
 	}
 
 	target.set = function(value) {
-		console.log('list set', value, value || []);
 		value = value || [];
 		if (options.viewmodel) {
 			eval("var f=" + options.viewmodel);
 			target(ko.utils.arrayMap(value, function(item) { return new f(item); }));
-			console.log('list f', f, target());
 		} else {
 			target(value);
 		}

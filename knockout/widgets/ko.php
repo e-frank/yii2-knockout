@@ -31,36 +31,6 @@ class ko extends \yii\base\Widget
 		return $classname;
 	}
 
-	public function render222($view, $params = [])
-	{
-		$this->config = $params;
-		// $view  = $this->getView();
-
-		// $view  = $this->getView();
-		$models = "\r\n// initialize models\r\n\r\n";
-		if (array_key_exists('models', $params)) {
-			foreach ($params['models'] as $value) {
-				if (!array_key_exists(get_class($value['model']), $this->models)) {
-					$this->models[get_class($value['model'])] = $value['model'];
-					$options                                  = array_key_exists('options', $value) ? $value['options'] : [];
-					$models                                  .= $this::viewmodel($value['model'], $options);
-				}
-			}
-			$view->registerJs($models, \yii\web\View::POS_BEGIN);
-		}
-		if (array_key_exists('js', $params)) {
-			foreach ($params['js'] as $key => $value) {
-				$view->registerJsFile($value, [], [\yii\web\View::POS_END]);
-			}
-		}
-
-		$view->registerJs(self::vm($params), \yii\web\View::POS_END);
-		$view->registerJs(self::vmReady($params), \yii\web\View::POS_READY);
-
-		// echo $models;
-		return;
-	}	
-
 
 	private static function getName($params) {
 		if (array_key_exists('name', $params)) {
