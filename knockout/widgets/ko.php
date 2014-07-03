@@ -11,7 +11,10 @@ use yii\helpers\ArrayHelper;
 class ko extends \yii\base\Widget
 {
 	const PREFIX      = 'viewmodel';
+<<<<<<< HEAD
 	const COMPONENT   = 'component';
+=======
+>>>>>>> origin/master
 	public $prefix    = self::PREFIX;
 	public $model     = null;
 	public $viewmodel = null;
@@ -147,8 +150,12 @@ class ko extends \yii\base\Widget
 		if (array_key_exists('components', $params)) {
 			$components = $params['components'];
 			foreach ($components as $key => $value) {
+<<<<<<< HEAD
 				$value['prefix'] = $p = array_key_exists('prefix', $value) ? $value['prefix'] : self::COMPONENT;
 
+=======
+				$p = array_key_exists('prefix', $value) ? $value['prefix'] : self::PREFIX;
+>>>>>>> origin/master
 				$e = [];
 				$ex = '';
 				if ($n = self::getName($value)) {
@@ -218,7 +225,10 @@ class ko extends \yii\base\Widget
 		}
 
 		$lines[] = "\tthis.set(obj);";
+<<<<<<< HEAD
 		$lines[] = "\tconsole.log(obj, this);";
+=======
+>>>>>>> origin/master
 		$lines[] = "\tthis.finish();";
 		$lines[] = '}';
 		$lines[] = '';
@@ -287,6 +297,7 @@ class ko extends \yii\base\Widget
 
 
 	public function run() {
+<<<<<<< HEAD
 		$view = $this->getView();
 
 		\efrank\knockout\assets\KnockoutAsset::register($view);
@@ -313,6 +324,21 @@ class ko extends \yii\base\Widget
 		}
 
 
+=======
+		if (isset($this->viewmodel)) {
+			$this->getView()->registerJs($this::viewmodel($this->viewmodel), \yii\web\View::POS_END);
+		} elseif (isset($this->model)) {
+			$this->getView()->registerJs($this::viewmodel($this->model), \yii\web\View::POS_END);
+		}
+		if ($this->bind) {
+			$p = array_key_exists('prefix', $this->viewmodel) ? $this->viewmodel['prefix'] : $this::PREFIX;
+			$t = '';
+			if ($this->bind !== true) {
+				$t = sprintf(', document.getElementById(\'%s\')', $this->bind);
+			}
+			$this->getView()->registerJs(sprintf('ko.applyBindings(new %s%s()%s);', $p, $this::getName($this->viewmodel), $t) , \yii\web\View::POS_READY);
+		}
+>>>>>>> origin/master
 		return;
 	}
 }
