@@ -15,7 +15,7 @@ namespace efrank\knockout\assets;
  */
 class KnockoutAsset extends \yii\web\AssetBundle
 {
-	public $sourcePath = '@vendor/e-frank/yii2-knockout/assets/knockout';
+	public $sourcePath = '@vendor/e-frank/yii2-knockout/knockout/assets/knockout';
 
 	public $css = [
 	];
@@ -24,7 +24,10 @@ class KnockoutAsset extends \yii\web\AssetBundle
 		'knockout.js' => 'knockout-3.1.0.js',
 		'knockout.base.js',
 		'knockout.bindinghandlers.js',
-		'knockout.viewmodels.js',
+		'extenders/knockout.extender.datetime.js',
+		'extenders/knockout.extender.decimal.js',
+		'extenders/knockout.extender.component.js',
+		'extenders/knockout.extender.list.js',
 	];
 
 }

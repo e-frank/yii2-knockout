@@ -13,7 +13,7 @@
 	],
 	"require": {
 		"php": ">=5.4.0",
-		"ivaynberg/select2": "*"
+		"twitter/typeahead.js": "dev-master"
 	},
 	"autoload": {
 		"psr-4": {

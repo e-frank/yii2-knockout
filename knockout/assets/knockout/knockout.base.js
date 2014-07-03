@@ -10,34 +10,57 @@ function viewmodelBase() {
 
 	var self 		= this;
 	this.options    = {};
-	// this.assign     = function(o) { self.instance = o; }
 	this.setOptions = function(o) { self.options = o; }
 
 	this.logOptions = function() { console.log (self.options); }
 	this.get 		= function() { 
 		var result = {};
-		$.each(self, function(key, value) {
-			if (ko.isObservable(self[key]))
-				result[key] = self[key]();
-		})
+		if (self._attributes && self._attributes.length > 0) {
+			$.each(self._attributes, function(key, value) {
+				if (ko.isWriteableObservable(self[value])) {
+					if (self[value].get)
+						result[value] = self[value].get();
+					else
+						result[value] = self[value]();
+				}
+			})
+		} else {
+			$.each(self, function(key, value) {
+				if (ko.isWriteableObservable(self[key]))
+					result[key] = self[key]();
+			})
+		}
 		return result;
 	};
+	this.getModel	= function() {
+		var o = {};
+		o[self._name] = self.get();
+		return o;
+	}
 	this.set 		= function(data, errors) { 
 
-		$.each(data, function(key, value) {
-			var p = self[key];
-			if (ko.isObservable(p)) {
-				p(value);
-				// console.log('set2 ', key, value, p());
-				if (p.errors)
-					p.errors([]);
-			}
-		})
+		if (self._attributes) {
+			$.each(self._attributes, function(key, value) {
+				var p = self[value];
+				d = data ? data[value] : null;
+				if (ko.isWriteableObservable(p)) {
+					p.set ? p.set(d) : p(d);
+					p.errors ? p.errors([]) : null;
+				}
+			})
+		} else {
+			$.each(data, function(key, value) {
+				var p = self[key];
+				if (ko.isWriteableObservable(p)) {
+					p.set ? p.set(value) : p(value);
+					p.errors ? p.errors([]) : null;
+				}
+			})
+		}
 		errors = errors || [];
 		$.each(errors, function(key, value) {
 			var p = self[key];
-			if (p.errors)
-				p.errors(value);
+			p.errors ? p.errors(value) : null;
 		});
 		return self;
 	};
@@ -48,13 +71,19 @@ function viewmodelBase() {
 			$('#' + self.options.modal).modal(show);	
 	}
 
-	this.save = function() {
-		if (self.options.save)
-			self.post(self.options.save, self.get(), function(data) {
+	this.update = function(callback) {
+		if (self.options.url)
+			self.post(self.options.url, self.getModel(), function(data) {
 				if (self.options.grid)
 					baseViewModel.pjax(self.options.grid);
-				if (data.error == false) {
+				if (((data.errors && data.errors.length == 0) || (!data.errors))) {
 					self.modal('hide');
+					var ok = true;
+					if (callback)
+						ok = callback(data) || true;
+					if (ok && self.options.redirect) {
+						window.location.href = options.redirect;
+					}
 				}
 			});
 	}
@@ -80,7 +109,7 @@ function viewmodelBase() {
 			$('#' + self.options.form).on('submit', function(event, data) {
 				event.preventDefault();
 				console.log('captured form submit');
-				self.save();
+				self.update();
 				return false;
 			});
 		}
