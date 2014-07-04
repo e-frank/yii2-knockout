@@ -30,4 +30,8 @@ class KnockoutAsset extends \yii\web\AssetBundle
 		'extenders/knockout.extender.list.js',
 	];
 
+	public $depends = [
+        'efrank\knockout\assets\TypeaheadAsset',
+	];
+
 }
