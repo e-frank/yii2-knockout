@@ -17,10 +17,14 @@ class ko extends \yii\base\Widget
 	public $viewmodel = null;
 	public $bind      = true;
 
+	public static $extenders = [
+		'date'     => ['format' => 'YYYY-MM-DD', 'time' => false, ],
+		'datetime' => ['format' => 'YYYY-MM-DD', 'time' => true,  ], 
+	];
+
 	private static $labels = [];
 	private $models        = [];
 	private $config        = [];
-
 
 	private static function get_real_class($obj) {
 		$classname = get_class($obj);
@@ -266,10 +270,10 @@ class ko extends \yii\base\Widget
 							$extenders[$value]['decimal'] = ['decimals' => $matches[1]];
 							break;
 						case 'date':
-							$extenders[$value]['date'] = (object)[];
+							$extenders[$value]['date'] = (object)['format' => 'DD.MM.YY'];
 							break;
 						case 'datetime':
-							$extenders[$value]['datetime'] = (object)[];
+							$extenders[$value]['datetime'] = (object)['format' => 'DD.MM.YY'];
 							break;
 					}
 				}
