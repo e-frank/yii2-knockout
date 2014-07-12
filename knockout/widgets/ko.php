@@ -5,6 +5,7 @@ use Yii;
 use yii\property\InvalidConfigException;
 use yii\helpers\Html;
 use yii\helpers\Url;
+use yii\helpers\Json;
 use yii\helpers\ArrayHelper;
 
 
@@ -16,10 +17,11 @@ class ko extends \yii\base\Widget
 	public $model     = null;
 	public $viewmodel = null;
 	public $bind      = true;
+	public $options   = [];
 
 	public static $extenders = [
-		'date'     => ['format' => 'YYYY-MM-DD', 'time' => false, ],
-		'datetime' => ['format' => 'YYYY-MM-DD', 'time' => true,  ], 
+	'date'     => ['format' => 'YYYY-MM-DD', 'time' => false, ],
+	'datetime' => ['format' => 'YYYY-MM-DD', 'time' => true,  ], 
 	];
 
 	private static $labels = [];
@@ -48,9 +50,9 @@ class ko extends \yii\base\Widget
 		return false;
 	}
 
-	public static function viewmodel($params, $viewmodels = []) {
+	public static function viewmodel($params, $view, $viewmodels = []) {
 		if (!is_array($params) && $params instanceof \yii\base\Model)  {
-			$params = self::fromModel($params);
+			$params = self::fromModel($params, $view);
 		}
 
 		$hasModel = array_key_exists('model', $params);
@@ -60,7 +62,7 @@ class ko extends \yii\base\Widget
 		}
 
 		if ($hasModel) {
-			$params = array_merge($params, self::fromModel($params['model'], $params));
+			$params = array_merge($params, self::fromModel($params['model'], $view, $params));
 		}
 
 		if (!array_key_exists('name', $params)) {
@@ -74,7 +76,9 @@ class ko extends \yii\base\Widget
 
 		$name   = $params['name'];
 		$class  = (array_key_exists('class', $params)) ? $params['class'] : (array_key_exists('model', $params) ? get_class($params['model']) : '');
-		$prefix = array_key_exists('prefix', $params) ? $params['prefix'] : self::PREFIX;
+		$prefix = ArrayHelper::getValue($params, 'prefix', self::PREFIX);
+
+
 		// if (array_key_exists('remove', $params))
 		// 	$attr = array_values(array_diff($params['attributes'], $params['remove']));
 		// else
@@ -82,10 +86,8 @@ class ko extends \yii\base\Widget
 		if (!array_key_exists('extenders', $params))
 			$params['extenders'] = [];
 
-		if (array_key_exists('attributes', $params))
-			$attr = $params['attributes'];
-		else
-			$attr = [];
+		$validators = ArrayHelper::getValue($params, 'validators', []);
+		$attr       = ArrayHelper::getValue($params, 'attributes', []);
 
 		$attributes = array();
 		foreach ($attr as $key => $value) {
@@ -99,6 +101,7 @@ class ko extends \yii\base\Widget
 				$attributes[$value]['name'] = $value;
 			}
 		}
+
 		if (array_key_exists('extensions', $params)) {
 
 		}
@@ -123,26 +126,42 @@ class ko extends \yii\base\Widget
 
 		$lines      = array();
 
-		$options = array_key_exists('options', $params) ? $params['options'] : [];
+		$options        = ArrayHelper::getValue($params, 'options', []);
+		$options['url'] = ArrayHelper::getValue($options, 'url', Url::to(''));
 
 		$lines[] = '';
 		$lines[] = sprintf('function %s%s(obj, options) {', $prefix, $name);
 		$lines[] = "\tthis.prototype = new viewmodelBase();";
 		$lines[] = "\tviewmodelBase.call(this);";
 		$lines[] = "\tvar self = this;";
-		$lines[] = sprintf("\tthis._name       = %s;", json_encode($name));
-		$lines[] = sprintf("\tthis._class      = %s;", json_encode($class));
+		$lines[] = sprintf("\tthis._name       = %s;", Json::encode($name));
+		$lines[] = sprintf("\tthis._class      = %s;", Json::encode($class));
 
 		$lines[] = "\tobj = obj || {};";
-		$lines[] = sprintf("\tthis.options = $.extend(this.options || {}, options, %s);\r\n", json_encode($options, JSON_PRETTY_PRINT || JSON_FORCE_OBJECT));
+		$lines[] = sprintf("\tthis.options = $.extend(this.options || {}, options, %s);\r\n", Json::encode($options, JSON_PRETTY_PRINT | JSON_FORCE_OBJECT));
 
+		$_validators = [];
 		foreach ($attributes as $key => $value) {
 			if (array_key_exists($value['name'], $extenders))
 				$e = $extenders[$value['name']];
 			else
 				$e = [];
-			$e['errors'] = true;
-			$lines[] = "\t" .sprintf('this.%1$s = ko.observable().extend(%2$s);', $value['name'], json_encode($e, JSON_PRETTY_PRINT || JSON_FORCE_OBJECT));
+
+			if (isset($validators[$value['name']])) {
+				$e['validators'] = sprintf("{abortValidation:self._isSetting,fn:function(value,messages){%s}}", implode('/* --- */', $validators[$value['name']])); //$validators[$value['name']];
+				// $e['errors'] = true;
+			}
+
+			$exstring = [];
+			foreach ($e as $ekey => $evalue) {
+				if ($ekey == 'validators' && count($evalue) > 0) {
+					$_validators[] = $key;
+				}
+				$exstring[] = (in_array($ekey, ['validators'])) ? sprintf('%s: %s', $ekey, ($evalue)) : sprintf('%s: %s', $ekey, json_encode($evalue));
+			}
+			$lines[] = "\t" .sprintf('this.%1$s = ko.observable().extend({%2$s});', $value['name'], implode(',', $exstring));
+			// $lines[] = "\t" .sprintf('this.%1$s = ko.observable().extend(%2$s);', $value['name'], json_encode($e, JSON_PRETTY_PRINT || JSON_FORCE_OBJECT));
+			// $lines[] = "\t" .sprintf('this.%1$s = ko.observable().extend({%2$s});', $value['name'], $exstring);// json_encode($e, JSON_PRETTY_PRINT || JSON_FORCE_OBJECT));
 		}
 
 
@@ -199,7 +218,7 @@ class ko extends \yii\base\Widget
 
 					if (!in_array($p . $n, $viewmodels)) {
 						$viewmodels[] = $p . $n;
-						$lists_ .= self::viewmodel($value, $viewmodels);
+						$lists_ .= self::viewmodel($value, $view, $viewmodels);
 					}
 				} else {
 					$e['list'] = true;
@@ -212,6 +231,12 @@ class ko extends \yii\base\Widget
 		}
 
 		$lines[] = sprintf("\tthis._attributes = %s;\r\n", json_encode(array_keys($attributes)));
+		$lines[] = sprintf("\tthis._validators = %s;\r\n", json_encode($_validators));
+		$lines[] = sprintf("\tthis.validate = function() {
+			$.each(self._validators, function(index, value) {
+				self[value].validate();
+			})
+		};\r\n", json_encode($_validators));
 
 		if (array_key_exists('code', $params)) {
 			$code = $params['code'];
@@ -231,7 +256,7 @@ class ko extends \yii\base\Widget
 	}
 
 
-	public static function fromModel($model, $params = []) {
+	public static function fromModel($model, $view, $params = []) {
 		$class  = self::get_real_class($model);
 		$lines  = array();
 
@@ -263,18 +288,21 @@ class ko extends \yii\base\Widget
 				if (!array_key_exists($value, $extenders)) {
 					switch($columns[$value]->type) {
 						case 'integer':
-							$extenders[$value]['decimal'] = ['decimals' => 0];
-							break;
+						$extenders[$value]['decimal'] = ['decimals' => 0];
+						break;
 						case 'decimal':
-							preg_match('|^decimal\(\d+,(\d+)\)$|i', $columns[$value]->dbType, $matches);
-							$extenders[$value]['decimal'] = ['decimals' => $matches[1]];
-							break;
+						preg_match('|^decimal\(\d+,(\d+)\)$|i', $columns[$value]->dbType, $matches);
+						$extenders[$value]['decimal'] = ['decimals' => $matches[1]];
+						break;
 						case 'date':
-							$extenders[$value]['date'] = (object)['format' => 'DD.MM.YY'];
-							break;
+						$extenders[$value]['date'] = (object)['format' => 'DD.MM.YY'];
+						break;
 						case 'datetime':
-							$extenders[$value]['datetime'] = (object)['format' => 'DD.MM.YY'];
-							break;
+						$extenders[$value]['datetime'] = (object)['format' => 'DD.MM.YY'];
+						break;
+						default:
+						$extenders[$value]['display'] = true;
+						break;
 					}
 				}
 			}
@@ -283,9 +311,28 @@ class ko extends \yii\base\Widget
 		if (!array_key_exists('extenders', $params))
 			$params['extenders'] = [];
 
-		$result              = array_merge(['name' => $class, 'attributes' => $attributes], $params);
-		$result['extenders'] = array_merge($extenders, $params['extenders']);
-		$result['model']     = $model;
+		if (!array_key_exists('validators', $params))
+			$params['validators'] = [];
+
+		$validators = [];
+		if (method_exists($model, 'getValidators')) {
+			$v = $model->getValidators();
+			foreach ($v as $validator) {
+				foreach ($validator->attributes as $attribute) {
+					$js = $validator->clientValidateAttribute($model, $attribute, $view);
+					if (!empty($js)) {
+						if (!isset($validators[$attribute]))
+							$validators[$attribute] = [];
+						$validators[$attribute][] = $js;
+					}
+				}
+			}
+		}
+
+		$result               = array_merge(['name' => $class, 'attributes' => $attributes], $params);
+		$result['extenders']  = array_merge($extenders, $params['extenders']);
+		$result['validators'] = array_merge($validators, $params['validators']);
+		$result['model']      = $model;
 		return $result;
 	}
 
@@ -296,24 +343,23 @@ class ko extends \yii\base\Widget
 		\efrank\knockout\assets\KnockoutAsset::register($view);
 
 		if (isset($this->viewmodel)) {
-			$view->registerJs($this::viewmodel($this->viewmodel), \yii\web\View::POS_END);
+			$view->registerJs($this::viewmodel($this->viewmodel, $view), \yii\web\View::POS_END);
 		} elseif (isset($this->model)) {
-			$view->registerJs($this::viewmodel($this->model), \yii\web\View::POS_END);
+			$view->registerJs($this::viewmodel($this->model, $view), \yii\web\View::POS_END);
 		}
 
 		$load = '';
-		if ($model = array_key_exists('model', $this->viewmodel) ? $this->viewmodel['model'] : false) {
-			$load = json_encode($model->toArray());
+		if ($model = ArrayHelper::getValue($this->viewmodel, 'model', false)) {
+			$load = Json::encode($model->toArray());
 		}
 
-
 		if ($this->bind) {
-			$p               = array_key_exists('prefix', $this->viewmodel) ? $this->viewmodel['prefix'] : $this::PREFIX;
+			$p               = ArrayHelper::getValue($this->viewmodel, 'prefix', $this::PREFIX);
 			$t               = '';
 			if ($this->bind !== true) {
 				$t = sprintf(', document.getElementById(\'%s\')', $this->bind);
 			}
-			$view->registerJs(sprintf('ko.applyBindings(new %s%s(%s)%s);', $p, $this::getName($this->viewmodel), $load, $t) , \yii\web\View::POS_READY);
+			$view->registerJs(sprintf('ko.applyBindings(new %s%s(%s,%s)%s);', $p, $this::getName($this->viewmodel), $load, Json::encode($this->options, JSON_FORCE_OBJECT), $t) , \yii\web\View::POS_READY);
 		}
 
 

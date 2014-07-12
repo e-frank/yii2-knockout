@@ -11,6 +11,9 @@ function viewmodelBase() {
 	var self 		= this;
 	this.options    = {};
 	this.setOptions = function(o) { self.options = o; }
+	this.errors 	= ko.observableArray([]);
+	this.hasError	= ko.computed(function() { return this.errors.length > 0}, this);
+	this.hasErrors	= this.hasError;
 
 	this.logOptions = function() { console.log (self.options); }
 	this.get 		= function() { 
@@ -37,8 +40,10 @@ function viewmodelBase() {
 		o[self._name] = self.get();
 		return o;
 	}
-	this.set 		= function(data, errors) { 
 
+	this._isSetting = ko.observable(false);
+	this.set       = function(data, errors) { 
+		self._isSetting(true);
 		if (self._attributes) {
 			$.each(self._attributes, function(key, value) {
 				var p = self[value];
@@ -46,6 +51,7 @@ function viewmodelBase() {
 				if (ko.isWriteableObservable(p)) {
 					p.set ? p.set(d) : p(d);
 					p.errors ? p.errors([]) : null;
+					p.validated ? p.validated(false) : null;
 				}
 			})
 		} else {
@@ -54,14 +60,21 @@ function viewmodelBase() {
 				if (ko.isWriteableObservable(p)) {
 					p.set ? p.set(value) : p(value);
 					p.errors ? p.errors([]) : null;
+					p.validated ? p.validated(false) : null;
 				}
 			})
 		}
 		errors = errors || [];
+		var eee = [];
 		$.each(errors, function(key, value) {
 			var p = self[key];
-			p.errors ? p.errors(value) : null;
+			if (p.errors) {
+				p.errors(value);
+				eee.concat(value);
+			}
 		});
+		self.errors(eee);
+		self._isSetting(false);
 		return self;
 	};
 
@@ -74,6 +87,8 @@ function viewmodelBase() {
 	this.update = function(callback) {
 		if (self.options.url)
 			self.post(self.options.url, self.getModel(), function(data) {
+				console.log('post result' ,data);
+				alert('999');
 				if (self.options.grid)
 					baseViewModel.pjax(self.options.grid);
 				if (((data.errors && data.errors.length == 0) || (!data.errors))) {

@@ -137,6 +137,8 @@ ko.extenders.decimal = function (target, options) {
 			target(0);
 	}
 	
+
+	target.display = target.decimal;
 	return target;
 }
 
@@ -183,5 +185,6 @@ ko.extenders.percent = function (target, options) {
 		target(null);
 	}
 	
+	target.display = target.percent;
 	return target;
 }
