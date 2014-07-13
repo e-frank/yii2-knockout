@@ -249,9 +249,7 @@ class ko extends \yii\base\Widget
 					$e_comp = ['read' => $value];
 				}
 
-				$e_comp_ext = ArrayHelper::getValue($e_comp, 'extenders', []);
-				unset($e_comp['extenders']);
-
+				$e_comp_ext = ArrayHelper::remove($e_comp, 'extenders', []);
 				$lines[] = "\t" .sprintf('this.%s = ko.computed(%s).extend(%s);', $key, Json::encode($e_comp, JSON_FORCE_OBJECT), Json::encode($e_comp_ext, JSON_FORCE_OBJECT));
 			}
 		}

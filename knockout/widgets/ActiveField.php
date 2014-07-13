@@ -2,16 +2,19 @@
 namespace efrank\knockout\widgets;
 
 use yii\helpers\Html;
+use yii\helpers\Json;
 use yii\helpers\ArrayHelper;
 
 
 class ActiveField extends \yii\bootstrap\ActiveField
 {
 
-    public $wrapperOptions = [
-#        'data-bind' => "css:{'has-error':true}",
-    ];
+    public $template = "{label}\n{beginWrapper}\n{input}\n{hidden}\n{hint}\n{error}\n{endWrapper}";
 
+    // public $templateButtons = "{label}\n{beginWrapper}\n{input}\n{hidden}\n{hint}\n{error}\n{endWrapper}";
+
+    public $wrapperOptions = [
+    ];
 
 
     public function render222($content = null)
@@ -36,7 +39,7 @@ class ActiveField extends \yii\bootstrap\ActiveField
             }
             if ($this->inputTemplate) {
                 $input = isset($this->parts['{input}']) ?
-                    $this->parts['{input}'] : Html::activeTextInput($this->model, $this->attribute, $this->inputOptions);
+                $this->parts['{input}'] : Html::activeTextInput($this->model, $this->attribute, $this->inputOptions);
                 $this->parts['{input}'] = strtr($this->inputTemplate, ['{input}' => $input]);
             }
         }
@@ -44,16 +47,10 @@ class ActiveField extends \yii\bootstrap\ActiveField
     }
 
 
-    public function __construct222($config = [])
+    public function __construct($config = [])
     {
-        // $layoutConfig = $this->createLayoutConfig($config);
-        // $config = ArrayHelper::merge($layoutConfig, $config);
-
-		$attribute         = ArrayHelper::getValue($config, 'attribute', []);
-		$config['options'] = ArrayHelper::getValue($config, 'options', []);
-        $config['options']['data-bind'] = ArrayHelper::getValue($config['options'], 'data-bind', sprintf("css:{'has-error':%s}", $attribute));
-
-        // $config['parts']
+        $layoutConfig = $this->createLayoutConfig($config);
+        $config       = ArrayHelper::merge($layoutConfig, $config);
         return parent::__construct($config);
     }
 
@@ -61,49 +58,58 @@ class ActiveField extends \yii\bootstrap\ActiveField
      * @param array $instanceConfig the configuration passed to this instance's constructor
      * @return array the layout specific default configuration for this instance
      */
-    protected function createLayoutConfig222($instanceConfig)
+    protected function createLayoutConfig($instanceConfig)
     {
-        $config = [
-            'hintOptions' => [
-                'tag' => 'p',
-                'class' => 'help-block',
-            ],
-            'errorOptions' => [
-                'tag' => 'p',
-                'class' => 'help-block help-block-error',
-            ],
-            'inputOptions' => [
-                'class' => 'form-control',
-            ],
-        ];
 
-        $layout = $instanceConfig['form']->layout;
-
-        if ($layout === 'horizontal') {
-            $config['template'] = "{label}\n{beginWrapper}\n{input}\n{error}\n{endWrapper}\n{hint}";
-            $cssClasses = [
-                'offset' => 'col-sm-offset-3',
-                'label' => 'col-sm-3',
-                'wrapper' => 'col-sm-6',
-                'error' => '',
-                'hint' => 'col-sm-3',
-            ];
-            if (isset($instanceConfig['horizontalCssClasses'])) {
-                $cssClasses = ArrayHelper::merge($cssClasses, $instanceConfig['horizontalCssClasses']);
-            }
-            $config['horizontalCssClasses'] = $cssClasses;
-            $config['wrapperOptions'] = ['class' => $cssClasses['wrapper']];
-            $config['labelOptions'] = ['class' => 'control-label ' . $cssClasses['label']];
-            $config['errorOptions'] = ['class' => 'help-block help-block-error ' . $cssClasses['error']];
-            $config['hintOptions'] = ['class' => 'help-block ' . $cssClasses['hint']];
-        } elseif ($layout === 'inline') {
-            $config['labelOptions'] = ['class' => 'sr-only'];
-            $config['enableError'] = false;
-        }
+        $attribute = $instanceConfig['attribute'];
+        $form      = $instanceConfig['form'];
+        $config    = array(
+            'options' => array(
+                'class'     => 'control-group',
+                'data-bind' => sprintf("css:{'%s':%s.hasError,'%s':%s.validated}", $form->errorCssClass, $attribute, $form->successCssClass, $attribute),
+                ),
+            'inputOptions' => array(
+                'name'      => '',
+                'class'     => 'form-control',
+                'data-bind' => sprintf('value:%s.display', $attribute),
+                ),
+            'parts' => array(
+                '{attribute}' => $attribute,
+                '{hidden}'    => Html::activeHiddenInput($instanceConfig['model'], $attribute, ['id' => null, 'data-bind' => sprintf('value:%s', $attribute)]),
+                '{error}'     => sprintf('<!-- ko foreach: %1$s.errors --><p class="help-block help-block-error" data-bind="text:$data"></p><!-- /ko --><!-- ko if: (%1$s.errors || []).length == 0 --><p class="help-block help-block-error"></p><!-- /ko -->', $attribute),
+                ),
+            );
 
         return $config;
     }
 
 
+    public function append($content) {
+        if (is_array($content))
+            $content = implode('</span><span class="input-group-addon">', $content);
+        $this->inputTemplate = '<div class="input-group">{input}<span class="input-group-addon">'.$content.'</span></div>';
+        return $this;
+    }
 
+
+    public function right() {
+        $this->inputOptions['class'] = $this->inputOptions['class'] . ' text-right';
+        return $this;
+    }
+
+
+    public function radioButtons($items, $options = []) {
+        $s = '<label class="btn" data-bind="css:{active:%2$s()==%3$s}, click: function() {%2$s(%3$s)}"><input type="radio" data-bind="checked: %2$s, checkedValue:%3$s" name="%4$s"> %1$s</label>';
+        $x = [];
+
+        foreach ($items as $key => $value) {
+            $x[] = sprintf($s, $value, $this->attribute, Json::encode($key), Html::getInputName($this->model, $this->attribute));
+        }
+        $this->inputTemplate = sprintf('<div class="btn-group" data-toggle="buttons">%s</div>', implode('', $x));
+        return $this;
+    }
+
+    public function prepend() {
+
+    }
 }
