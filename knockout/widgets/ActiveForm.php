@@ -23,7 +23,7 @@ class ActiveForm extends \yii\bootstrap\ActiveForm {
 	private $labels = [];
 
 	public $fieldConfig = [
-	'template' => "{label}\n{beginWrapper}\n{input}\n{hint}\n{error}\n{endWrapper}",
+	'template' => "{label}\n{beginWrapper}\n{input}\n{hidden}\n{hint}\n{error}\n{endWrapper}",
 	];
 
 	public function field($model, $attribute, $options = []) {
@@ -33,19 +33,20 @@ class ActiveForm extends \yii\bootstrap\ActiveForm {
 		$options['inputOptions']      = $inputOptions;
 		$options['options']           = ['class' => 'control-group', 'data-bind' => sprintf("css:{'%s':%s.hasError,'%s':%s.validated}", $this->errorCssClass, $attribute, $this->successCssClass, $attribute)];
 		$options['errorOptions']      = ['data-bind' => sprintf("foreach:%s.errors", $attribute)];
-		$options['parts']['{error}']  = sprintf('<!-- ko foreach: %1$s.errors --><p class="help-block help-block-error" data-bind="text:$data"></p><!-- /ko --><!-- ko if: %1$s.errors.length == 0 --><p class="help-block help-block-error"></p><!-- /ko -->', $attribute);
+		$options['parts']['{error}']  = sprintf('<!-- ko foreach: %1$s.errors --><p class="help-block help-block-error" data-bind="text:$data"></p><!-- /ko --><!-- ko if: (%1$s.errors || []).length == 0 --><p class="help-block help-block-error"></p><!-- /ko -->', $attribute);
+		$options['parts']['{hidden}'] = Html::hiddenInput(sprintf('%s[%s]', basename(get_class($model)), $attribute), null, ['data-bind' => sprintf('value: %s', $attribute)]);
 		// $options['parts']['{hint}']   = sprintf('<p class="help-block" data-bind="text:%1$s"></p><p class="help-block" data-bind="text:%1$s.hasError"></p><p class="help-block" data-bind="text:%1$s.validated"></p>', $attribute);
 		return parent::field($model, $attribute, $options);
 	}
 
 
 	public function display($model, $attribute, $options = []) {
-		$inputOptions                = ArrayHelper::getValue($options, 'inputOptions', []);
-		$inputOptions['data-bind']   = ArrayHelper::getValue($inputOptions, 'data-bind', sprintf('value: %s.display', $attribute));
-		$options['inputOptions']     = $inputOptions;
-		$options['options']          = ['class' => 'control-group', 'data-bind' => sprintf("css:{'has-error':%s.hasError}", $attribute)];
-		// $options['errorOptions']     = ['data-bind' => sprintf("foreach:%s.errors", $attribute)];
-		$options['parts']['{error}'] = sprintf('<!-- ko foreach: %s.errors --><p class="help-block help-block-error" data-bind="text:$data"></p><!-- /ko -->', $attribute);
+		$inputOptions                 = ArrayHelper::getValue($options, 'inputOptions', []);
+		$inputOptions['data-bind']    = ArrayHelper::getValue($inputOptions, 'data-bind', sprintf('value: %s.display', $attribute));
+		$options['inputOptions']      = $inputOptions;
+		$options['options']           = ['class' => 'control-group', 'data-bind' => sprintf("css:{'has-error':%s.hasError}", $attribute)];
+		// $options['errorOptions']   = ['data-bind' => sprintf("foreach:%s.errors", $attribute)];
+		$options['parts']['{error}']  = sprintf('<!-- ko foreach: %1$s.errors --><p class="help-block help-block-error" data-bind="text:$data"></p><!-- /ko --><!-- ko if: %1$s.errors.length == 0 --><p class="help-block help-block-error"></p><!-- /ko -->', $attribute);
 		return parent::field($model, $attribute, $options);
 	}
 

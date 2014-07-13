@@ -1,7 +1,7 @@
 {
 	var _n_ = ((1234.5).toLocaleString());
-    ko.extenders.thousandsSeperator = _n_.toLocaleString().substring(1, 2);
-    ko.extenders.decimalSeperator   = _n_.toLocaleString().substring(5, 6);
+    ko.extenders.thousandsSeparator = _n_.toLocaleString().substring(1, 2);
+    ko.extenders.decimalSeparator   = _n_.toLocaleString().substring(5, 6);
 }
 
 
@@ -88,17 +88,17 @@ ko.extenders.decimal = function (target, options) {
 	//	default options
 	options	=	$.extend({
 		decimals:           2,
-		decimalSeperator:   ko.extenders.decimalSeperator,
-		thousandsSeperator: ko.extenders.thousandsSeperator,
+		decimalSeparator:   ko.extenders.decimalSeparator,
+		thousandsSeparator: ko.extenders.thousandsSeparator,
 		null:               true
 	}, options);
 	
-	// if (options.thousandsSeperator == null) {
-	// 	options.thousandsSeperator = ko.extenders.thousandsSeperator;
+	// if (options.thousandsSeparator == null) {
+	// 	options.thousandsSeparator = ko.extenders.thousandsSeparator;
 	// }
 
-	// if (options.decimalSeperator == null) {
-	// 	options.decimalSeperator = ko.extenders.decimalSeperator;
+	// if (options.decimalSeparator == null) {
+	// 	options.decimalSeparator = ko.extenders.decimalSeparator;
 	// }
 
 	target.decimal = ko.computed({
@@ -107,7 +107,7 @@ ko.extenders.decimal = function (target, options) {
 			var t = target();
 
 			if (t != null && t != undefined && t != '') {
-				return number_format(t, options.decimals, options.decimalSeperator, options.thousandsSeperator);
+				return number_format(t, options.decimals, options.decimalSeparator, options.thousandsSeparator);
 			} else {
 				if (options.null)
 					return '';
@@ -116,8 +116,8 @@ ko.extenders.decimal = function (target, options) {
 			}
 		},
 		write: function(v) {
-			v = v.replace(options.thousandsSeperator, '');
-			v = v.replace(options.decimalSeperator, '.');
+			v = v.replace(options.thousandsSeparator, '');
+			v = v.replace(options.decimalSeparator, '.');
 			var t = parseFloat(v);
 			if (t != null && t != undefined && t != '' && !isNaN(t))
 				target(t.toFixed(options.decimals));
@@ -149,8 +149,8 @@ ko.extenders.percent = function (target, options) {
 	options	=	$.extend({
 		decimals: 0,
 		null:     true,
-		thousandsSeperator: null,
-		decimalSeperator: null
+		thousandsSeparator: null,
+		decimalSeparator: null
 	}, options);
 
 	target.percent = ko.computed({
@@ -158,7 +158,7 @@ ko.extenders.percent = function (target, options) {
 		read: function() {
 			var t = target();
 			if (t != null && t != undefined && t != '')
-				return number_format(t * 100, options.decimals, options.decimalSeperator, options.thousandsSeperator);
+				return number_format(t * 100, options.decimals, options.decimalSeparator, options.thousandsSeparator);
 			else {
 				if (options.null)
 					return '';
@@ -167,8 +167,8 @@ ko.extenders.percent = function (target, options) {
 			}
 		},
 		write: function(v) {
-			v = v.replace(options.thousandsSeperator, '');
-			v = v.replace(options.decimalSeperator, '.');
+			v = v.replace(options.thousandsSeparator, '');
+			v = v.replace(options.decimalSeparator, '.');
 			var t = parseFloat(v);
 			if (t != null && t != undefined && t != '')
 				target(v / 100);
