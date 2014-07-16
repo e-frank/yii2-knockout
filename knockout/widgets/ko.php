@@ -52,7 +52,7 @@ class ko extends \yii\base\Widget
 		return false;
 	}
 
-	public static function viewmodel($params, $view, &$viewmodels = null) {
+	public static function viewmodel(&$params, $view, &$viewmodels = null) {
 		if ($viewmodels == null) {
 			$viewmodels = [];
 		}
@@ -136,6 +136,17 @@ class ko extends \yii\base\Widget
 		$lines[] = "\tobj = obj || {};";
 		$lines[] = sprintf("\tthis.options = $.extend(this.options || {}, options, %s);\r\n", Json::encode($options, JSON_PRETTY_PRINT | JSON_FORCE_OBJECT));
 
+		// component attributes
+		$components = ArrayHelper::getValue($params, 'components', []);
+		foreach ($components as $key => $value) {
+			$keys = ArrayHelper::getValue($value, 'key', []);
+			foreach ($keys as $componentKey => $componentTarget) {
+				if (!in_array($componentKey, $attributes)) {
+					$attributes[$componentKey]  = ['name' => $componentKey];
+				}
+			}
+		}
+
 		$_validators = [];
 		foreach ($attributes as $key => $value) {
 			$e             = ArrayHelper::getValue($extenders, $value['name'], []);
@@ -150,40 +161,35 @@ class ko extends \yii\base\Widget
 		}
 
 
-		// components
 		$components_ = '';
-		if (array_key_exists('components', $params)) {
-			$components = $params['components'];
-			foreach ($components as $key => $value) {
-				$p = ArrayHelper::getValue($value, 'prefix', self::COMPONENT);
-				$value['prefix'] = $p;
+		foreach ($components as $key => $value) {
+			$p = ArrayHelper::getValue($value, 'prefix', self::COMPONENT);
+			$value['prefix'] = $p;
 
-				$e = [];
-				$ex = '';
-				if ($n = self::getName($value)) {
-					$e = ArrayHelper::getValue($extenders, $n, []);
+			$e = [];
+			$ex = '';
+			if ($n = self::getName($value)) {
+				$e = ArrayHelper::getValue($extenders, $n, []);
 
-					$e['component'] = new JsExpression(sprintf('{viewmodel:%s,parent:self,key:%s}', $p.$n, Json::encode(ArrayHelper::getValue($value, 'key', []), JSON_FORCE_OBJECT)));
+				$e['component'] = new JsExpression(sprintf('{viewmodel:%s,parent:self,key:%s}', $p.$n, Json::encode(ArrayHelper::getValue($value, 'key', []), JSON_FORCE_OBJECT)));
 
-					if (!in_array($p . $n, $viewmodels)) {
-						$viewmodels[] = $p . $n;
-						$components_ .= self::viewmodel($value, $view, $viewmodels);
-					}
-
-
-					$new = sprintf('new %s%s()', $p, $n);
-				} else {
-					$e['component'] = new JsExpression('true');
-					$new = '{}';
+				if (!in_array($p . $n, $viewmodels)) {
+					$viewmodels[] = $p . $n;
+					$components_ .= self::viewmodel($value, $view, $viewmodels);
 				}
 
-				$attributes[$value['attribute']]  = ['name' => $value['attribute']];
-				$lines[] = "\t" .sprintf('this.%1$s = ko.observable(%3$s).extend(%2$s);', $value['attribute'], Json::encode($e), $new);
 
+				$new = sprintf('new %s%s()', $p, $n);
+			} else {
+				$e['component'] = new JsExpression('true');
+				$new = '{}';
 			}
-		} else {
-			$components = [];
+
+			$attributes[$value['attribute']]  = ['name' => $value['attribute']];
+			$lines[] = "\t" .sprintf('this.%1$s = ko.observable(%3$s).extend(%2$s);', $value['attribute'], Json::encode($e), $new);
+
 		}
+
 
 
 		// lists
@@ -353,6 +359,19 @@ class ko extends \yii\base\Widget
 	}
 
 
+	public static function getModelData($viewmodel) {
+		$data = [];
+		$model = ArrayHelper::getValue($viewmodel, 'model', null);
+		if ($model) {
+			$data = $model->toArray();
+		}
+		$components=  ArrayHelper::getValue($viewmodel, 'components', []);
+		foreach ($components as $key => $value) {
+			$data[$value['attribute']] = self::getModelData($value);
+		}
+		return $data;
+	}
+
 	public function run() {
 		$view = $this->getView();
 
@@ -364,9 +383,8 @@ class ko extends \yii\base\Widget
 			$view->registerJs($this::viewmodel($this->model, $view), \yii\web\View::POS_END);
 		}
 
-		$load = '';
+		$load = Json::encode(self::getModelData($this->viewmodel), JSON_FORCE_OBJECT);
 		if ($model = ArrayHelper::getValue($this->viewmodel, 'model', false)) {
-			$load = Json::encode($model->toArray());
 		}
 
 		if ($this->bind) {

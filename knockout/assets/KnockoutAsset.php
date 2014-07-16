@@ -34,6 +34,7 @@ class KnockoutAsset extends \yii\web\AssetBundle
 	];
 
 	public $depends = [
+        'efrank\knockout\assets\HandleBarsAsset',
         'efrank\knockout\assets\TypeaheadAsset',
 	];
 

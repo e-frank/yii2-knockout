@@ -43,13 +43,14 @@ function viewmodelBase() {
 
 	this._isSetting = ko.observable(false);
 	this.set       = function(data, errors) { 
+		errors = errors || {};
 		self._isSetting(true);
 		if (self._attributes) {
 			$.each(self._attributes, function(key, value) {
 				var p = self[value];
 				d = data ? data[value] : null;
 				if (ko.isWriteableObservable(p)) {
-					p.set ? p.set(d) : p(d);
+					p.set ? p.set(d, errors[value]) : p(d);
 					p.errors ? p.errors([]) : null;
 					p.validated ? p.validated(false) : null;
 				}
@@ -64,7 +65,6 @@ function viewmodelBase() {
 				}
 			})
 		}
-		errors = errors || [];
 		var eee = [];
 		$.each(errors, function(key, value) {
 			var p = self[key];
@@ -75,6 +75,7 @@ function viewmodelBase() {
 		});
 		self.errors(eee);
 		self._isSetting(false);
+		console.log('setting done', self);
 		return self;
 	};
 
@@ -87,7 +88,7 @@ function viewmodelBase() {
 	this.update = function(callback) {
 		if (self.options.url)
 			self.post(self.options.url, self.getModel(), function(data) {
-				console.log('post result' ,data);
+				console.log('update post result' ,data);
 				alert('999');
 				if (self.options.grid)
 					baseViewModel.pjax(self.options.grid);
@@ -97,7 +98,7 @@ function viewmodelBase() {
 					if (callback)
 						ok = callback(data) || true;
 					if (ok && self.options.redirect) {
-						window.location.href = options.redirect;
+						window.location.href = self.options.redirect;
 					}
 				}
 			});
@@ -115,7 +116,7 @@ function viewmodelBase() {
 			if (callback)
 				callback(data);
 		}, 'json');
-		console.log(p);		
+		console.log('post return', p);		
 	}
 
 	this.formSubmit	= function() {

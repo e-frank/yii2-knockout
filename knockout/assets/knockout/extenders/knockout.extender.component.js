@@ -8,7 +8,7 @@ ko.extenders.component = function (target, options) {
 		key:       {}
 	}, options);
 	
-	console.log('component', options);
+	// console.log('component', options);
 
 	if (options.viewmodel && options.parent) {
 		target.assign = function() {
@@ -20,16 +20,22 @@ ko.extenders.component = function (target, options) {
 						t._attributes.push(val);
 					t[val] = ko.computed({
 						owner: target,
-						read:  function() { return options.parent[index](); },
-						write: function(v) {},
+						read:  function() {
+							// console.log('comp par', options.parent, index);
+							return options.parent[index]();
+						},
+						write: function(v) {
+							options.parent[index](v);
+							// console.log('write comp', v);
+						},
 					});
-					console.log(index, val);
+					// console.log(index, val);
 				});
-				console.log('new attr', t._attributes)
+				// console.log('new attr', t._attributes)
 			}
 		}
 		target.subscribe(function(v) {
-			console.log('component changed');
+			// console.log('component changed');
 			target.assign();
 		})
 		target.assign();
@@ -52,10 +58,9 @@ ko.extenders.component = function (target, options) {
 		return result;
 	}
 
-	target.set = function(value) {
-		options.viewmodel ? target().set(value) : target(value);
-
-		console.log('comp set', target());
+	target.set = function(value, errors) {
+		options.viewmodel ? target().set(value, errors) : target(value);
+		// console.log('comp set', target());
 	}
 
 	return target;

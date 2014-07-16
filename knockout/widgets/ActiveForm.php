@@ -19,6 +19,7 @@ class ActiveForm extends \yii\bootstrap\ActiveForm {
 	public $enableClientValidation = false;
 	public $validateOnSubmit       = false;
 	public $validateOnChange       = false;
+	public $afterSubmit            = null;
 
 	private $labels = [];
 
@@ -105,20 +106,16 @@ class ActiveForm extends \yii\bootstrap\ActiveForm {
 		// if (!isset($this->beforeSubmit))
 		// 	$this->beforeSubmit = new JsExpression('alert(1)');
 
-		$this->beforeSubmit = new JsExpression('function($form) {
-			console.log("beforeSubmit", $form);
-			return false;
-		}');
-
 		$view = $this->getView();
-		$view->registerJs(sprintf('$("#%1$s button[type=submit]").click(function(e) {
-			alert(222);
+		$view->registerJs(sprintf('$("#%1$s [type=submit]").click(function(e) {
 			e.preventDefault();
 			var vm = ko.dataFor(document.getElementById("%1$s"));
-			if (vm && vm.update) vm.update(%2$s);
+			var before = %2$s;
+			if (before && !before(vm)) return;
+			if (vm && vm.update) vm.update(%3$s);
 			console.log("vm", vm.getModel());
 			return false;
-		});', $this->getId(), Json::encode($this->beforeSubmit)), View::POS_READY);
+		});', $this->getId(), Json::encode($this->beforeSubmit), Json::encode($this->afterSubmit)), View::POS_READY);
 
 		// echo Html::beginTag('div', $this->options);
 		parent::init();

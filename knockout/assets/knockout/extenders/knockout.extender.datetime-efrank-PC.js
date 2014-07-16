@@ -34,10 +34,6 @@ ko.extenders.minutes = [
 
 ko.extenders.datetime = function (target, options) {
 
-	target.minutes = ko.extenders.minutes;
-	target.hours   = ko.extenders.hours;
-
-
 	//	default options
 	options	=	$.extend({
 		utc		:	false,
@@ -49,7 +45,7 @@ ko.extenders.datetime = function (target, options) {
 		hour	:	false,
 		minute	:	false,
 		time	:	false,
-		round	:	true,
+		round	:	false,
 		format  :   'YYYY-MM-DD',
 		null	:	true
 	}, options);
@@ -75,31 +71,20 @@ ko.extenders.datetime = function (target, options) {
 		return result;
 	}
 	
-	// target.moment	=	ko.computed({
-	// 	owner	:	target,
-	// 	read	:	function() {
-	// 		var	t	=	target();
-	// 		return getMoment(t);
-	// 	},
-	// 	write	:	function (v) {
-	// 		if (v && v.isValid()) {
-	// 			target(v.format(date_db));
-	// 		}
-	// 	}
-	// });
-	
-	target.moment = ko.observable(getMoment(target()));
-	target.moment.subscribe(function(v) {
-		if (v == null) {
-			target(v);
-		} else {
-			target(target.moment().format(date_db));
+
+	target.moment	=	ko.computed({
+		owner	:	target,
+		read	:	function() {
+			var	t	=	target();
+			return getMoment(t);
+		},
+		write	:	function (v) {
+			if (v && v.isValid()) {
+				target(v.format(date_db));
+			}
 		}
 	});
-	target.subscribe(function(v) {
-		target.moment(getMoment(v));
-	});
-
+	
 
 	target.date		=	ko.computed({
 		owner	:	target,
@@ -122,7 +107,7 @@ ko.extenders.datetime = function (target, options) {
 
 							//	round to quarters
 							if (options.round && m && m.isValid()) {
-								m.minute(m.minute() - m.minute() % 15);
+								m.minute( m.minute() - m.minute() % 15);
 								m.second(0);
 							}
 							
@@ -248,12 +233,6 @@ ko.extenders.datetime = function (target, options) {
 
 	target.current = function() {
 		target(getMoment(moment().format(date_db)).format(date_db));
-		// var m = moment();
-		// if (options.round && m && m.isValid()) {
-		// 	m.minute(m.minute() - m.minute() % 15);
-		// 	m.second(0);
-		// }
-		// target(m.format(date_db));
 	}
 	
 	target.clear = function() {
