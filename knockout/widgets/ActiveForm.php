@@ -109,7 +109,7 @@ class ActiveForm extends \yii\bootstrap\ActiveForm {
 		$view = $this->getView();
 		$view->registerJs(sprintf('$("#%1$s [type=submit]").click(function(e) {
 			e.preventDefault();
-			var vm = ko.dataFor(document.getElementById("%1$s"));
+			var vm     = ko.dataFor(document.getElementById("%1$s"));
 			var before = %2$s;
 			if (before && !before(vm)) return;
 			if (vm && vm.update) vm.update(%3$s);

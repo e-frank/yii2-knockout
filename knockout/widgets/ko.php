@@ -245,14 +245,33 @@ class ko extends \yii\base\Widget
 			}
 		}
 
+		$arrays = ArrayHelper::getValue($params, 'arrays', []);
+		if (!empty($arrays)) {
+			foreach ($arrays as $key => $value) {
+				$e_ext__ = ArrayHelper::getValue($value, 'extenders', []);
+				$e_ext = [];
+				if (is_array($e_ext__)) {
+					foreach ($e_ext__ as $k => $v) {
+						if (is_int($k))
+							$e_ext[$v] = [];
+						else
+							$e_ext[$k] = $v;
+					}
+				} else {
+					$e_ext = [$value => new JsExpression('true')];
+				}
+				$lines[] = "\t" .sprintf('this.%1$s = ko.observableArray(%2$s).extend(%3$s);', $key, Json::encode(ArrayHelper::getValue($value, 'value', [])), Json::encode($e_ext, JSON_FORCE_OBJECT));
+			}
+		}
+
 		$computed = ArrayHelper::getValue($params, 'computed', []);
 		if (!empty($computed)) {
 			foreach ($computed as $key => $value) {
-				$e_comp = ['owner' => new JsExpression('self')];
+				$e_comp = ['owner' => new JsExpression('this')];
 				if (is_array($value)) {
 					$e_comp = ArrayHelper::merge($e_comp, $value);
 				} else {
-					$e_comp = ['read' => $value];
+					$e_comp['read'] = new JsExpression($value);
 				}
 
 				$e_comp_ext = ArrayHelper::remove($e_comp, 'extenders', []);

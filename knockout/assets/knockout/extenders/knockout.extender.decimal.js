@@ -90,7 +90,7 @@ ko.extenders.decimal = function (target, options) {
 		decimals:           2,
 		decimalSeparator:   ko.extenders.decimalSeparator,
 		thousandsSeparator: ko.extenders.thousandsSeparator,
-		null:               true
+		nullable:           true
 	}, options);
 	
 	// if (options.thousandsSeparator == null) {
@@ -106,24 +106,24 @@ ko.extenders.decimal = function (target, options) {
 		read: function() {
 			var t = target();
 
-			if (t != null && t != undefined && t != '') {
+			if ($.isNumeric(t)) {
 				return number_format(t, options.decimals, options.decimalSeparator, options.thousandsSeparator);
 			} else {
-				if (options.null)
+				if (options.nullable)
 					return '';
 				else
-					return 0;
+					return number_format(0, options.decimals, options.decimalSeparator, options.thousandsSeparator);
 			}
 		},
 		write: function(v) {
 			v = v.replace(options.thousandsSeparator, '');
 			v = v.replace(options.decimalSeparator, '.');
 			var t = parseFloat(v);
-			if (t != null && t != undefined && t != '' && !isNaN(t))
+			if ($.isNumeric(t))
 				target(t.toFixed(options.decimals));
 			else {
-				if (options.null)
-					target(null);
+				if (options.nullable)
+					target('');
 				else
 					target(0);
 			}
@@ -131,7 +131,7 @@ ko.extenders.decimal = function (target, options) {
 	})
 	
 	target.clear = function() {
-		if (options.null)
+		if (options.nullable)
 			target(null);
 		else
 			target(0);
