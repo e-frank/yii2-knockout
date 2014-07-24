@@ -12,7 +12,6 @@ ko.extenders.component = function (target, options) {
 
 	if (options.viewmodel && options.parent) {
 		target.assign = function() {
-			console.log('target assign');
 			var t = target();
 			if (t) {
 				$.each(options.key, function(index, val) {

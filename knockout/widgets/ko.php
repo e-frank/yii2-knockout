@@ -227,6 +227,27 @@ class ko extends \yii\base\Widget
 			})
 	};\r\n");
 
+
+		$observables = ArrayHelper::getValue($params, 'observables', []);
+		if (!empty($observables)) {
+			foreach ($observables as $key => $value) {
+				$e_ext__ = ArrayHelper::getValue($value, 'extenders', []);
+				$e_ext = [];
+				if (is_array($e_ext__)) {
+					foreach ($e_ext__ as $k => $v) {
+						if (is_int($k))
+							$e_ext[$v] = [];
+						else
+							$e_ext[$k] = $v;
+					}
+				} else {
+					$e_ext = [$value => new JsExpression('true')];
+				}
+				$lines[] = "\t" .sprintf('this.%1$s = ko.observable(%2$s).extend(%3$s);', $key, Json::encode(ArrayHelper::getValue($value, 'value', null, JSON_FORCE_OBJECT)), Json::encode($e_ext, JSON_FORCE_OBJECT));
+			}
+		}
+
+
 		$extensions = ArrayHelper::getValue($params, 'extensions', []);
 		if (!empty($extensions)) {
 			foreach ($extensions as $key => $value) {
@@ -276,6 +297,13 @@ class ko extends \yii\base\Widget
 
 				$e_comp_ext = ArrayHelper::remove($e_comp, 'extenders', []);
 				$lines[] = "\t" .sprintf('this.%s = ko.computed(%s).extend(%s);', $key, Json::encode($e_comp, JSON_FORCE_OBJECT), Json::encode($e_comp_ext, JSON_FORCE_OBJECT));
+			}
+		}
+
+		$subscriptions = ArrayHelper::getValue($params, 'subscriptions', []);
+		if (!empty($subscriptions)) {
+			foreach ($subscriptions as $key => $value) {
+				$lines[] = "\t" .sprintf('this.%s.subscribe(%s);', $key, Json::encode($value));
 			}
 		}
 

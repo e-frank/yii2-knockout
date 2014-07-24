@@ -31,6 +31,8 @@ class KnockoutAsset extends \yii\web\AssetBundle
 		'extenders/knockout.extender.decimal.js',
 		'extenders/knockout.extender.component.js',
 		'extenders/knockout.extender.list.js',
+		'extenders/knockout.extender.lookup.js',
+		'extenders/knockout.extender.subscribe.js',
 	];
 
 	public $depends = [

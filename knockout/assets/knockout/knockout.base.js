@@ -75,7 +75,7 @@ function viewmodelBase() {
 		});
 		self.errors(eee);
 		self._isSetting(false);
-		console.log('setting done', self);
+		// console.log('setting done', self);
 		return self;
 	};
 
@@ -88,8 +88,7 @@ function viewmodelBase() {
 	this.update = function(callback) {
 		if (self.options.url)
 			self.post(self.options.url, self.getModel(), function(data) {
-				console.log('update post result' ,data);
-				alert('999');
+				// console.log('update post result' ,data);
 				if (self.options.grid)
 					baseViewModel.pjax(self.options.grid);
 				if (((data.errors && data.errors.length == 0) || (!data.errors))) {
@@ -111,7 +110,7 @@ function viewmodelBase() {
 		else
 			opt = postdata;
 		var p = $.post(url, opt, function(data) {
-			console.log('base post result', data);
+			// console.log('base post result', data);
 			self.set(data.model, data.errors);
 			if (callback)
 				callback(data);
