@@ -113,7 +113,6 @@ class ActiveForm extends \yii\bootstrap\ActiveForm {
 			var before = %2$s;
 			if (before && !before(vm)) return;
 			if (vm && vm.update) vm.update(%3$s);
-			console.log("vm", vm.getModel());
 			return false;
 		});', $this->getId(), Json::encode($this->beforeSubmit), Json::encode($this->afterSubmit)), View::POS_READY);
 

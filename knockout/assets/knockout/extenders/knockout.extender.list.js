@@ -62,7 +62,9 @@ ko.extenders.list = function (target, options) {
 
 	target.add = function(value) {
 		console.log('list add', value);
-		options.viewmodel ? target.push(new options.viewmodel(value.get())) : target.push(value);
+		value = value || {};
+		var v = value.get ? value.get() : value;
+		options.viewmodel ? target.push(new options.viewmodel(v)) : target.push(v);
 	}
 
 	target.edit = function($data) {

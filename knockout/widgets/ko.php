@@ -196,7 +196,7 @@ class ko extends \yii\base\Widget
 		$lists_ = '';
 		if (array_key_exists('lists', $params)) {
 			foreach ($params['lists'] as $key => $value) {
-				$lines[] = '// ' . serialize($value);
+				// $lines[] = '// ' . serialize($value);
 				$e = [];
 				$p = array_key_exists('prefix', $value) ? $value['prefix'] : self::PREFIX;
 				$ex = '';
@@ -406,18 +406,37 @@ class ko extends \yii\base\Widget
 	}
 
 
+
 	public static function getModelData($viewmodel) {
 		$data = [];
 		$model = ArrayHelper::getValue($viewmodel, 'model', null);
 		if ($model) {
 			$data = $model->toArray();
 		}
-		$components=  ArrayHelper::getValue($viewmodel, 'components', []);
+		$components =  ArrayHelper::getValue($viewmodel, 'components', []);
 		foreach ($components as $key => $value) {
 			$data[$value['attribute']] = self::getModelData($value);
 		}
+		$lists =  ArrayHelper::getValue($viewmodel, 'lists', []);
+		foreach ($lists as $k => $list) {
+			$listname        = ArrayHelper::getValue($list, 'attribute', "list{$k}");
+			$n               = self::getName($list);
+			$listvalue       = ArrayHelper::getValue($list, 'value', []);
+			$data[$listname] = [];
+			if ($n) {
+				foreach ($listvalue as $item) {
+					$data[$listname][] = self::getModelData(ArrayHelper::merge($list, ['model' => $item]));
+				}
+			} else {
+				foreach ($listvalue as $item) {
+					$data[$listname][] = $item->toArray();
+				}
+			}
+		}
 		return $data;
 	}
+
+
 
 	public function run() {
 		$view = $this->getView();
@@ -430,7 +449,7 @@ class ko extends \yii\base\Widget
 			$view->registerJs($this::viewmodel($this->model, $view), \yii\web\View::POS_END);
 		}
 
-		$load = Json::encode(self::getModelData($this->viewmodel), JSON_FORCE_OBJECT);
+		$load = Json::encode(self::getModelData($this->viewmodel));
 		if ($model = ArrayHelper::getValue($this->viewmodel, 'model', false)) {
 		}
 
