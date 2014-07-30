@@ -185,13 +185,13 @@ class ActiveField extends \yii\bootstrap\ActiveField
         $this->inputOptions['data-date-format'] = ArrayHelper::getValue($options, 'dateFormat', isset($this->form->dateFormat) ? $this->form->dateFormat : 'yyyy-mm-dd');
 
         $this->inputTemplate = sprintf('<div class="row">
-            <div class="col-sm-6 form-inline">
+            <div class="col-lg-5 col-md-12 form-inline">
                 <div class="input-group">
                     <span class="input-group-addon"><i class="glyphicon glyphicon-calendar"></i></span>
                     {input}
                 </div>
             </div>
-            <div class="col-sm-6 form-inline">
+            <div class="col-lg-7 col-md-12 form-inline">
                 <select class="form-control" data-bind="options: %1$s.hours, optionsValue: \'key\', optionsText:\'value\', value:%1$s.hour, optionsCaption: \'--\'"></select>
                 :
                 <select class="form-control" data-bind="options: %1$s.minutes, optionsValue: \'key\', optionsText:\'value\', value:%1$s.minute, optionsCaption: \'--\'"></select>

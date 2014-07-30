@@ -107,7 +107,9 @@ class ko extends \yii\base\Widget
 		if (!empty($remove)) {
 			$attributes = array_diff_key($attributes, $remove);
 		}
-		$extenders = array_intersect_key(ArrayHelper::getValue($params, 'extenders', []), $attributes);
+		
+		// $extenders = array_intersect_key(ArrayHelper::getValue($params, 'extenders', []), $attributes);
+		$extenders = ArrayHelper::getValue($params, 'extenders', []);
 		
 		if (array_key_exists('key', $params)) {
 			$key = $params['key'];
@@ -294,8 +296,7 @@ class ko extends \yii\base\Widget
 				} else {
 					$e_comp['read'] = new JsExpression($value);
 				}
-
-				$e_comp_ext = ArrayHelper::remove($e_comp, 'extenders', []);
+				$e_comp_ext = ArrayHelper::remove($extenders, $key, []);
 				$lines[] = "\t" .sprintf('this.%s = ko.computed(%s).extend(%s);', $key, Json::encode($e_comp, JSON_FORCE_OBJECT), Json::encode($e_comp_ext, JSON_FORCE_OBJECT));
 			}
 		}
