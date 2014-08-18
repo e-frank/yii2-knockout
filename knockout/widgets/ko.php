@@ -19,6 +19,7 @@ class ko extends \yii\base\Widget
 	public $viewmodel = null;
 	public $bind      = true;
 	public $options   = [];
+	public $cached	  = true;
 
 	public static $formats = array(
 		'date'               => 'YYYY-MM-DD',
@@ -41,7 +42,7 @@ class ko extends \yii\base\Widget
 	}
 
 
-	private static function getName($params) {
+	public static function getName($params) {
 		if (array_key_exists('name', $params)) {
 			return $params['name'];
 		} elseif (array_key_exists('model', $params)) {
@@ -107,7 +108,9 @@ class ko extends \yii\base\Widget
 		if (!empty($remove)) {
 			$attributes = array_diff_key($attributes, $remove);
 		}
-		$extenders = array_intersect_key(ArrayHelper::getValue($params, 'extenders', []), $attributes);
+		
+		// $extenders = array_intersect_key(ArrayHelper::getValue($params, 'extenders', []), $attributes);
+		$extenders = ArrayHelper::getValue($params, 'extenders', []);
 		
 		if (array_key_exists('key', $params)) {
 			$key = $params['key'];
@@ -193,6 +196,7 @@ class ko extends \yii\base\Widget
 
 
 		// lists
+		$lists  = [];
 		$lists_ = '';
 		if (array_key_exists('lists', $params)) {
 			foreach ($params['lists'] as $key => $value) {
@@ -211,21 +215,26 @@ class ko extends \yii\base\Widget
 				} else {
 					$e['list'] = true;
 				}
-				$attributes[$value['attribute']]  = ['name' => $value['attribute']];
-				$ext = substr_replace(json_encode($e, JSON_PRETTY_PRINT | JSON_FORCE_OBJECT), $ex, 1, 0);
-				$lines[] = "\t" .sprintf('this.%1$s = ko.observableArray().extend(%2$s);', $value['attribute'], $ext);
+				if (is_numeric($key))
+					$key = $value['attribute'];
+
+				$attributes[$key] = ['name' => $key];
+				$lists[]          = $key;
+				$ext              = substr_replace(json_encode($e, JSON_PRETTY_PRINT | JSON_FORCE_OBJECT), $ex, 1, 0);
+				$lines[]          = "\t" .sprintf('this.%1$s = ko.observableArray().extend(%2$s);', $key, $ext);
 
 			}
 		}
 
 
-		$lines[] = sprintf("\tthis._attributes = %s;\r\n", Json::encode(array_keys($attributes)));
+		$lines[] = sprintf("\r\n\tthis._attributes = %s;", Json::encode(array_keys($attributes)));
+		$lines[] = sprintf("\tthis._lists = %s;", Json::encode($lists));
 		$lines[] = sprintf("\tthis._validators = %s;\r\n", Json::encode($_validators));
-		$lines[] = sprintf("\tthis.validate = function() {
-			$.each(self._validators, function(index, value) {
-				self[value].validate();
-			})
-	};\r\n");
+	// 	$lines[] = sprintf("\tthis.validate = function() {
+	// 		$.each(self._validators, function(index, value) {
+	// 			self[value].validate();
+	// 		})
+	// };\r\n");
 
 
 		$observables = ArrayHelper::getValue($params, 'observables', []);
@@ -294,8 +303,7 @@ class ko extends \yii\base\Widget
 				} else {
 					$e_comp['read'] = new JsExpression($value);
 				}
-
-				$e_comp_ext = ArrayHelper::remove($e_comp, 'extenders', []);
+				$e_comp_ext = array_merge_recursive(ArrayHelper::remove($extenders, $key, []), ArrayHelper::remove($value, 'extenders', []));
 				$lines[] = "\t" .sprintf('this.%s = ko.computed(%s).extend(%s);', $key, Json::encode($e_comp, JSON_FORCE_OBJECT), Json::encode($e_comp_ext, JSON_FORCE_OBJECT));
 			}
 		}
@@ -419,7 +427,11 @@ class ko extends \yii\base\Widget
 		}
 		$lists =  ArrayHelper::getValue($viewmodel, 'lists', []);
 		foreach ($lists as $k => $list) {
-			$listname        = ArrayHelper::getValue($list, 'attribute', "list{$k}");
+			if (is_numeric($k)) {
+				$listname = ArrayHelper::getValue($list, 'attribute', "list{$k}");
+			} else {
+				$listname = $k;
+			}
 			$n               = self::getName($list);
 			$listvalue       = ArrayHelper::getValue($list, 'value', []);
 			$data[$listname] = [];
@@ -437,31 +449,52 @@ class ko extends \yii\base\Widget
 	}
 
 
-
-	public function run() {
-		$view = $this->getView();
+	public static function noCache($config = []) {
+		$bind = ArrayHelper::getValue($config, 'bind', true);
+		$view = ArrayHelper::getValue($config, 'view', Yii::$app->getView());
 
 		\efrank\knockout\assets\KnockoutAsset::register($view);
+		\yii\validators\ValidationAsset::register($view);
+
+		if (!empty($bind)) {
+			$viewmodel = ArrayHelper::getValue($config, 'viewmodel', []);
+			$options   = ArrayHelper::getValue($config, 'options', []);
+			$load      = Json::encode(self::getModelData($viewmodel));
+			$p         = ArrayHelper::getValue($viewmodel, 'prefix', self::PREFIX);
+			$t         = '';
+
+			if ($bind !== true) {
+				$t = sprintf(', document.getElementById(\'%s\')', $bind);
+			}
+			$view->registerJs(sprintf('ko.applyBindings(new %s%s(%s,%s)%s);', $p, self::getName($viewmodel), $load, Json::encode($options, JSON_FORCE_OBJECT), $t) , \yii\web\View::POS_READY);
+		}
+	}
+
+	public function run() {
+		$view   = $this->getView();
+		$cached = count($view->cacheStack) > 0;
+
 
 		if (isset($this->viewmodel)) {
-			$view->registerJs($this::viewmodel($this->viewmodel, $view), \yii\web\View::POS_END);
+			$vm = $this::viewmodel($this->viewmodel, $view);
 		} elseif (isset($this->model)) {
-			$view->registerJs($this::viewmodel($this->model, $view), \yii\web\View::POS_END);
+			$vm = $this::viewmodel($this->model, $view);
+		} else {
+			$vm = '';
 		}
 
-		$load = Json::encode(self::getModelData($this->viewmodel));
-		if ($model = ArrayHelper::getValue($this->viewmodel, 'model', false)) {
-		}
+		if ($cached) {
+			echo '<script>'.$vm.'</script>';
+		} else {
+			$view->registerJs($vm, \yii\web\View::POS_END);
 
-		if ($this->bind) {
-			$p               = ArrayHelper::getValue($this->viewmodel, 'prefix', $this::PREFIX);
-			$t               = '';
-			if ($this->bind !== true) {
-				$t = sprintf(', document.getElementById(\'%s\')', $this->bind);
-			}
-			$view->registerJs(sprintf('ko.applyBindings(new %s%s(%s,%s)%s);', $p, $this::getName($this->viewmodel), $load, Json::encode($this->options, JSON_FORCE_OBJECT), $t) , \yii\web\View::POS_READY);
+			self::noCache([
+				'bind'      => $this->bind,
+				'viewmodel' => $this->viewmodel,
+				'view'      => $view,
+				'options'   => $this->options
+				]);
 		}
-
 
 		return;
 	}

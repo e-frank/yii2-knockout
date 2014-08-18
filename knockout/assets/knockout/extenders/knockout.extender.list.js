@@ -19,16 +19,14 @@ ko.extenders.list = function (target, options) {
 			if (items.length > 0 && options.key != {}) {
 				$.each(items, function(i, t) {
 					$.each(options.key, function(index, val) {
-						if ($.inArray(val, t._attributes) == 0)
+						if ($.inArray(val, t._attributes) < 0)
 							t._attributes.push(val);
 						t[val] = ko.computed({
 							owner: target,
 							read:  function() { return options.parent[index](); },
 							write: function(v) {},
 						});
-						console.log(index, val);
 					});
-					console.log('new attr', t._attributes)
 				});
 			}
 		}
@@ -43,7 +41,7 @@ ko.extenders.list = function (target, options) {
 		var result = {};
 		if (options.viewmodel) {
 			var t = target() || [];
-			return ko.utils.arrayMap(t, function(item) { return item.getModel(); })
+			return ko.utils.arrayMap(t, function(item) { return item.get(); })
 		} else {
 			return (target() || []);
 		}
@@ -83,6 +81,16 @@ ko.extenders.list = function (target, options) {
 		if (options.update) {
 			ei.update(function(data) { return options.redirect || false; });
 		}
+	}
+
+	target.validate = function() {
+		var items = target() || [];
+		console.log('list val');
+		$.each(items, function(index, value) {
+			console.log(value);
+			if (value && value.validate)
+				value.validate();
+		})
 	}
 
 	target.editItem = ko.observable(options.viewmodel ? new options.viewmodel(options.defaults || {}) : options.defaults || {});

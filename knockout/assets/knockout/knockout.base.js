@@ -68,9 +68,12 @@ function viewmodelBase() {
 		var eee = [];
 		$.each(errors, function(key, value) {
 			var p = self[key];
-			if (p.errors) {
+			if (p && p.errors) {
 				p.errors(value);
 				eee.concat(value);
+			} else {
+				if (!p)
+					console.log('setting undefined: ', key)
 			}
 		});
 		self.errors(eee);
@@ -132,5 +135,21 @@ function viewmodelBase() {
 
 	this.finish 	= function() {
 		self.formSubmit();
+	}
+
+	this.validate 	= function() {
+		$.each(self._validators, function(key, value) {
+			var p = self[value];
+			if (p.validated && p.validated() != true && p.validate) {
+				p.validate();
+			}
+		})
+
+		$.each(self._lists, function(key, value) {
+			var p = self[value];
+			if (p.validate) {
+				p.validate();
+			}
+		})
 	}
 }
