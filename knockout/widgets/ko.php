@@ -206,7 +206,7 @@ class ko extends \yii\base\Widget
 				$ex = '';
 				if ($n = self::getName($value)) {
 					// $e['list'] = ['viewmodel' => $p . $n];
-					$ex = sprintf('list:{ viewmodel:%s, parent: self, key: %s }', $p.$n, json_encode($value['key']));
+					$ex = sprintf('list:{ viewmodel:%s, parent: self, key: %s }', $p.$n, Json::encode(ArrayHelper::getValue($value, 'key', [])));
 
 					if (!in_array($p . $n, $viewmodels)) {
 						$viewmodels[] = $p . $n;

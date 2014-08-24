@@ -134,8 +134,25 @@ function viewmodelBase() {
 	}
 
 	this.finish 	= function() {
+		console.log('finish', self._validators);
+
+		self.isValid	= ko.computed(function() { 
+			if (!this._validators)
+				return true;
+			var s      = this;
+			var result = true;
+			$.each(this._validators, function(index, value) {
+				console.log('try validate', index, value, s[value].hasError);
+				if (s[value].hasError && s[value].hasError())
+					result = false;
+			});
+			return result;  
+		}, self);
+
+
 		self.formSubmit();
 	}
+
 
 	this.validate 	= function() {
 		$.each(self._validators, function(key, value) {
