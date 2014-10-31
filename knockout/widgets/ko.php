@@ -8,7 +8,7 @@ use yii\helpers\Url;
 use yii\helpers\Json;
 use yii\web\JsExpression;
 use yii\helpers\ArrayHelper;
-
+use efrank\knockout\helpers\DateFormatConverter;
 
 class ko extends \yii\base\Widget
 {
@@ -22,16 +22,15 @@ class ko extends \yii\base\Widget
 	public $cached	  = true;
 
 	public static $formats = array(
-		'date'               => 'YYYY-MM-DD',
-		'thousandsSeparator' => '.',
-		'decimalSeparator'   => ',',
+		'date'               => null,
+		'thousandsSeparator' => null,
+		'decimalSeparator'   => null,
 		);
 
 	private $models        = [];
 	private $config        = [];
 
 	private static function getClassName($obj) {
-		return basename(get_class($obj));
 		$classname = get_class($obj);
 
 		if (preg_match('@\\\\([\w]+)$@', $classname, $matches)) {
@@ -48,7 +47,7 @@ class ko extends \yii\base\Widget
 		} elseif (array_key_exists('model', $params)) {
 			return self::getClassName($params['model']);
 		} elseif (array_key_exists('class', $params)) {
-			return basename($params['class']);
+			return self::getClassName($params['class']);
 		}
 		return false;
 	}
@@ -360,6 +359,8 @@ class ko extends \yii\base\Widget
 			foreach ($attributes as $key => $value) {
 				if (!array_key_exists($value, $extenders)) {
 					switch($columns[$value]->type) {
+						case 'smallint':
+						case 'long':
 						case 'integer':
 						{					
 							$extenders[$value]['decimal'] = ['decimals' => 0, 'thousandsSeparator' => $formats['thousandsSeparator']];
@@ -373,12 +374,12 @@ class ko extends \yii\base\Widget
 						}
 						case 'date':
 						{
-							$extenders[$value]['date'] = ['format' => ($formats['date']), 'time' => false];
+							$extenders[$value]['date'] = ['format' => DateFormatConverter::convertPhpToMoment($formats['date']), 'time' => false];
 							break;
 						}
 						case 'datetime':
 						{
-							$extenders[$value]['datetime'] = ['format' => ($formats['date']), 'time' => true];
+							$extenders[$value]['datetime'] = ['format' => DateFormatConverter::convertPhpToMoment($formats['date']), 'time' => true];
 							break;
 						}
 						default:
@@ -393,7 +394,7 @@ class ko extends \yii\base\Widget
 
 		$validators = [];
 		if (method_exists($model, 'getValidators')) {
-			$v = $model->getValidators();
+			$v = $model->getActiveValidators();
 			foreach ($v as $validator) {
 				foreach ($validator->attributes as $attribute) {
 					$js = $validator->clientValidateAttribute($model, $attribute, $view);
@@ -405,6 +406,7 @@ class ko extends \yii\base\Widget
 				}
 			}
 		}
+
 
 		$result               = array_merge(['name' => $class, 'attributes' => $attributes], $params);
 		$result['extenders']  = array_merge($extenders, ArrayHelper::getValue($params, 'extenders', []));
@@ -497,5 +499,60 @@ class ko extends \yii\base\Widget
 		}
 
 		return;
+	}
+
+
+	//
+	//	get formats from config/locale
+	//
+	public function init() {
+
+		$decimal  = self::$formats['decimalSeparator'];
+		$thousand = self::$formats['thousandsSeparator'];
+		$date     = self::$formats['date'];
+
+
+		$locale = Yii::$app->formatter->locale;
+		if (empty($locale))
+			$locale = Yii::$app->language;
+
+		if ($decimal == null || $thousand == null) {
+
+			if ($decimal == null)
+				$decimal = Yii::$app->formatter->decimalSeparator;
+			if ($thousand == null)
+				$thousand = Yii::$app->formatter->thousandSeparator;
+
+			if ($decimal == null || $thousand == null) {
+				$fmt = numfmt_create($locale, \NumberFormatter::DECIMAL);
+				if ($decimal == null)
+					$decimal = numfmt_get_symbol($fmt, \NumberFormatter::DECIMAL_SEPARATOR_SYMBOL);
+				if ($thousand == null)
+					$thousand = numfmt_get_symbol($fmt, \NumberFormatter::GROUPING_SEPARATOR_SYMBOL);
+			}
+
+			self::$formats['decimalSeparator']   = $decimal;
+			self::$formats['thousandsSeparator'] = $thousand;
+		}
+
+		if ($date == null) {
+
+		    $shortFormats = [
+		        'short'  => 3, // IntlDateFormatter::SHORT,
+		        'medium' => 2, // IntlDateFormatter::MEDIUM,
+		        'long'   => 1, // IntlDateFormatter::LONG,
+		        'full'   => 0, // IntlDateFormatter::FULL,
+		    ];
+
+			$fmt        = new \IntlDateFormatter($locale, $shortFormats[Yii::$app->formatter->dateFormat], \IntlDateFormatter::NONE, Yii::$app->formatter->timeZone);
+			$dateFormat = $fmt->getPattern();
+			$date       = \yii\helpers\FormatConverter::convertDateIcuToPhp($dateFormat);
+
+			self::$formats['date'] = $date;
+
+		}
+
+
+		return parent::init();
 	}
 }

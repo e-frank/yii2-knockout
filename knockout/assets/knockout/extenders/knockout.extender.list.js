@@ -14,7 +14,6 @@ ko.extenders.list = function (target, options) {
 
 	if (options.viewmodel && options.parent) {
 		target.assign = function() {
-			console.log('target assign');
 			var items = target() || [];
 			if (items.length > 0 && options.key != {}) {
 				$.each(items, function(i, t) {
@@ -31,7 +30,6 @@ ko.extenders.list = function (target, options) {
 			}
 		}
 		target.subscribe(function(v) {
-			console.log('list changed');
 			target.assign();
 		})
 		target.assign();
@@ -59,15 +57,12 @@ ko.extenders.list = function (target, options) {
 	}
 
 	target.add = function(value) {
-		console.log('list add', value);
 		value = value || {};
 		var v = value.get ? value.get() : value;
 		options.viewmodel ? target.push(new options.viewmodel(v)) : target.push(v);
 	}
 
 	target.edit = function($data) {
-		target._backup = $data;
-
 		if (options.viewmodel) {
 			target.editItem.set($data ? $data.get() : options.defaults || {});
 		} else {
@@ -77,7 +72,6 @@ ko.extenders.list = function (target, options) {
 
 	target.update = function() {
 		var ei = target.editItem();
-		console.log('list update', ei);
 		if (options.update) {
 			ei.update(function(data) { return options.redirect || false; });
 		}
@@ -93,7 +87,11 @@ ko.extenders.list = function (target, options) {
 		})
 	}
 
-	target.editItem = ko.observable(options.viewmodel ? new options.viewmodel(options.defaults || {}) : options.defaults || {});
+	target.getDefaults = function() {
+		return options.viewmodel ? new options.viewmodel(options.defaults || {}) : options.defaults || {};
+	}
+	target.editItem = ko.observable(target.getDefaults());
+	target.addItem  = ko.observable(target.getDefaults());
 
 	return target;
 }
