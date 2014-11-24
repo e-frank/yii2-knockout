@@ -147,10 +147,10 @@ ko.extenders.percent = function (target, options) {
 
 	//	default options
 	options	=	$.extend({
-		decimals: 0,
-		null:     true,
+		decimals:           0,
+		nullable:           true,
 		thousandsSeparator: null,
-		decimalSeparator: null
+		decimalSeparator:   null
 	}, options);
 
 	target.percent = ko.computed({
@@ -160,7 +160,7 @@ ko.extenders.percent = function (target, options) {
 			if (t != null && t != undefined && t != '')
 				return number_format(t * 100, options.decimals, options.decimalSeparator, options.thousandsSeparator);
 			else {
-				if (options.null)
+				if (options.nullable)
 					return '';
 				else
 					return 0;
@@ -173,7 +173,7 @@ ko.extenders.percent = function (target, options) {
 			if (t != null && t != undefined && t != '')
 				target(v / 100);
 			else {
-				if (options.null)
+				if (options.nullable)
 					target(null);
 				else
 					target(0);

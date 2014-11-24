@@ -24,6 +24,7 @@ class KnockoutAsset extends \yii\web\AssetBundle
 		'knockout.js' => 'knockout-3.1.0.js',
 		'knockout.base.js',
 		'knockout.bindinghandlers.js',
+		
 		'extenders/knockout.extender.display.js',
 		'extenders/knockout.extender.errors.js',
 		'extenders/knockout.extender.validators.js',
@@ -33,6 +34,12 @@ class KnockoutAsset extends \yii\web\AssetBundle
 		'extenders/knockout.extender.list.js',
 		'extenders/knockout.extender.lookup.js',
 		'extenders/knockout.extender.subscribe.js',
+
+		'knockout.mapping.js',
+
+		'sortable/jquery-ui.min.js',
+		'sortable/jquery-ui.touchpunch.js',
+		'sortable/knockout-sortable.min.js',
 	];
 
 	public $depends = [
