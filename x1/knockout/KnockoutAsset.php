@@ -5,7 +5,7 @@
  * @license http://www.yiiframework.com/license/
  */
 
-namespace efrank\knockout\assets;
+namespace x1\knockout;
 
 /**
  * This asset bundle provides the base javascript files for the Yii Framework.
@@ -15,7 +15,7 @@ namespace efrank\knockout\assets;
  */
 class KnockoutAsset extends \yii\web\AssetBundle
 {
-	public $sourcePath = '@vendor/e-frank/yii2-knockout/knockout/assets/knockout';
+	public $sourcePath = '@x1/knockout/assets';
 
 	public $css = [
 	];
@@ -23,7 +23,12 @@ class KnockoutAsset extends \yii\web\AssetBundle
 	public $js         = [
 		'knockout.js' => 'knockout-3.2.0.js',
 		'knockout.base.js',
-		'knockout.bindinghandlers.js',
+
+		'binding-handlers/knockout.bindinghandlers.checkbox.js',
+		'binding-handlers/knockout.bindinghandlers.fadein.js',
+		'binding-handlers/knockout.bindinghandlers.hiddenvalue.js',
+		'binding-handlers/knockout.bindinghandlers.js',
+		'binding-handlers/knockout.bindinghandlers.typeahead.js',
 		
 		'extenders/knockout.extender.display.js',
 		'extenders/knockout.extender.errors.js',
@@ -45,8 +50,8 @@ class KnockoutAsset extends \yii\web\AssetBundle
 	];
 
 	public $depends = [
-        'efrank\knockout\assets\HandleBarsAsset',
-        'efrank\knockout\assets\TypeaheadAsset',
+        // 'efrank\knockout\assets\HandleBarsAsset',
+        // 'efrank\knockout\assets\TypeaheadAsset',
 	];
 
 }

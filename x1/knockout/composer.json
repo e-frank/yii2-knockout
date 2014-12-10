@@ -1,0 +1,21 @@
+{
+    "name":        "e-frank/yii2-knockout",
+    "description": "Widget for creating Knockout viewmodels from yii models",
+    "keywords":    ["yii", "knockout"],
+    "type":        "yii2-extension",
+    "license":     "BSD-3-Clause",
+    "authors": [
+        {
+            "name": "Elmar Frank",
+            "email": "elmar.frank@efrank.at",
+            "homepage": "http://efrank.at"
+        }
+    ],
+    "require": {
+        "yiisoft/yii2": "*"
+    },
+    "autoload": {
+        "psr-4": { "x1\\knockout\\": "" }
+    },
+    "target-dir": "x1/knockout"
+}
