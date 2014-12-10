@@ -6,7 +6,10 @@ use yii\helpers\ArrayHelper;
 var <?=$namespace?>=<?=$namespace?> || {};
 <?=$namespace?>.<?=$name?> = {
 	create: function(options) {
-		var self = ko.mapping.fromJS(options.data, <?= $mapping ?>);
+		//var self = ko.mapping.fromJS(options.data, <?= $mapping ?>);
+		var self = new <?=$namespace?>.prototype();
+		ko.mapping.fromJS(options.data, <?= $mapping ?>, self);
+		self.init();
 
 <?
 $mappings = [];
@@ -16,8 +19,8 @@ foreach ($attributes as $attribute => $extenders) {
 }
 ?>
 
-		self.prototype = new <?=$namespace?>.prototype();
-		<?=$namespace?>.prototype.call(self);
+		//this.prototype = new <?=$namespace?>.prototype();
+		//<?=$namespace?>.prototype.call(this);
 
 
 		return self;

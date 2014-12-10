@@ -12,7 +12,8 @@
         }
     ],
     "require": {
-        "yiisoft/yii2": "*"
+        "yiisoft/yii2": "*",
+        "moment/moment": "*"
     },
     "autoload": {
         "psr-0": { "x1\\knockout\\": "" }

@@ -2,12 +2,15 @@ var <?= $namespace ?> = <?= $namespace ?> || {
 	prototype: function() {
 		var self = this;
 
-		// add errors for obserable arrays
-		for (key in this) {
-			if (this[key] && this[key].isObservableArray) {
-				this[key] = this[key].extend({arrayError: true});
+		this.init = function() {
+			// add errors for obserable arrays
+			for (key in this) {
+				if (this[key] && this[key].isObservableArray) {
+					this[key] = this[key].extend({arrayError: true});
+				}
 			}
 		}
+		this.init();
 
 
 		// return error for property
