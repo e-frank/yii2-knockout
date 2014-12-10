@@ -1,9 +1,9 @@
 ko.extenders.validators = function (target, options) {
-	//	default options
-	options	=	$.extend({
-		abortValidation: false,
-		fn:              null,
-	}, options);
+	// //	default options
+	// options	=	$.extend({
+	// 	abortValidation: false,
+	// 	fn:              null,
+	// }, options);
 
 	target.validated = ko.observable(false);
 	target.errors    = ko.observableArray([]);
@@ -15,7 +15,10 @@ ko.extenders.validators = function (target, options) {
 	target.validate = function() {
 		var value    = target();
 		var messages = [];
-		options.fn(value, messages);
+
+		if (options)
+			options(value, messages);
+		
 		if (messages.length > 0) {
 			target.validated(false);
 		} else {
@@ -26,9 +29,10 @@ ko.extenders.validators = function (target, options) {
 
 	// validate only if not setting object
 	target.subscribe(function(v) {
-		if (!(ko.unwrap(options.abortValidation) || false)) {
-			target.validate();
-		}
+		target.validate();
+		// if (!(ko.unwrap(options.abortValidation) || false)) {
+		// 	target.validate();
+		// }
 	});
 
 	return target;

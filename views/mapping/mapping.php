@@ -6,7 +6,6 @@ use yii\helpers\ArrayHelper;
 var <?=$namespace?>=<?=$namespace?> || {};
 <?=$namespace?>.<?=$name?> = {
 	create: function(options) {
-
 		var self = ko.mapping.fromJS(options.data, <?= $mapping ?>);
 
 <?
@@ -26,7 +25,7 @@ foreach ($attributes as $attribute => $extenders) {
 <?
 $mappings = array_filter($mappings);
 foreach ($mappings as $key => $mapping) {
-	echo sprintf("	,%s: { create: function(options) { return ko.mapping.fromJS(options.data, %s); }}\r\n", Json::encode($key), $mapping);
+	echo sprintf('	,%1$s: { create: function(options) { return ko.mapping.fromJS(options.data, %2$s); }}'."\r\n", Json::encode($key), $mapping);
 }
 ?>
 }

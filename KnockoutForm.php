@@ -1,5 +1,5 @@
 <?
-namespace x1\knockout\widgets;
+namespace x1\knockout;
 
 use Yii;
 use yii\helpers\Html;
@@ -24,7 +24,6 @@ class KnockoutForm extends \yii\base\Widget {
     {
         $w    = parent::begin($config);
         $view = $w->getView();
-
         echo $view->render('@x1/knockout/views/knockout-form/begin', [
             'id' => $w->id,
             ]);

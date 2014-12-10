@@ -36,7 +36,7 @@ use yii\helpers\Json;
 
 if (!empty($extenders)) {
 ?>
-		if (self.<?= $attribute ?>)	self.<?= $attribute ?>	= self.<?= $attribute ?>.extend(<?= Json::encode($extenders) ?>);
+		if (self.<?= $attribute ?>)	self.<?= $attribute ?>.extend(<?= Json::encode($extenders) ?>);
 <?
 }
 ?>

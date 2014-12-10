@@ -1,8 +1,3 @@
-<?
-use yii\helpers\ArrayHelper;
-use yii\helpers\Json;
-?>
-
 var <?= $namespace ?> = <?= $namespace ?> || { 
 	prototype: function() {
 		var self = this;
@@ -49,13 +44,5 @@ var <?= $namespace ?> = <?= $namespace ?> || {
 		}
 
 
-		// submit raw data
-		this.submit = function(data) {
-			console.log(ko.mapping.toJS(this));
-			return false;
-		}
-
-
 	},
-	fn: {}
 };

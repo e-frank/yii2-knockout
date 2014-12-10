@@ -66,7 +66,7 @@ class Mapping extends \yii\base\Widget {
                         ];
                     }
                 }
-
+                
                 // automatic type extender detection
                 if (array_key_exists($attribute, $columns)) {
                     switch($columns[$attribute]->type) {
@@ -176,6 +176,7 @@ class Mapping extends \yii\base\Widget {
 
         if (empty($this->name))
             $this->name = $this->id;
+
     }
 }
 

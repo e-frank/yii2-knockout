@@ -119,13 +119,20 @@ ko.extenders.decimal = function (target, options) {
 			v = v.replace(options.thousandsSeparator, '');
 			v = v.replace(options.decimalSeparator, '.');
 			var t = parseFloat(v);
+			var value;
 			if ($.isNumeric(t))
-				target(t.toFixed(options.decimals));
+				value = t.toFixed(options.decimals); 
 			else {
 				if (options.nullable)
-					target('');
+					value = '';
 				else
-					target(0);
+					value = 0;
+			}
+			
+			if (target() !== value) {
+				target(value);
+			} else {
+				target.display.notifySubscribers(value);
 			}
 		}
 	})
