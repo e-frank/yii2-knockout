@@ -1,5 +1,5 @@
 <?
-namespace efrank\knockout\helpers;
+namespace x1\knockout\helpers;
 
 class DateFormatConverter {
 
