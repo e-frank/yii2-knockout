@@ -21,7 +21,7 @@ class KnockoutAsset extends \yii\web\AssetBundle
 	];
 
 	public $js         = [
-		'knockout.js' => 'knockout-3.1.0.js',
+		'knockout.js' => 'knockout-3.2.0.js',
 		'knockout.base.js',
 		'knockout.bindinghandlers.js',
 		
@@ -34,8 +34,10 @@ class KnockoutAsset extends \yii\web\AssetBundle
 		'extenders/knockout.extender.list.js',
 		'extenders/knockout.extender.lookup.js',
 		'extenders/knockout.extender.subscribe.js',
+		'extenders/knockout.extender.array-error.js',
 
 		'knockout.mapping.js',
+		// 'mappings/knockout.mapping.base.js',
 
 		'sortable/jquery-ui.min.js',
 		'sortable/jquery-ui.touchpunch.js',
