@@ -45,8 +45,9 @@ class Mapping extends \yii\base\Widget {
         //
         if (!empty($this->model)) {
 
-            $formats = ArrayHelper::merge(self::$defaultFormats, $this->formats);
-            $columns = method_exists($this->model, 'getTableSchema') ? $this->model->getTableSchema()->columns : [];
+            $formats    = ArrayHelper::merge(self::$defaultFormats, $this->formats);
+            $columns    = method_exists($this->model, 'getTableSchema') ? $this->model->getTableSchema()->columns : [];
+            $attributes = array_keys($this->attributes);
 
             foreach ($this->model->safeAttributes() as $attribute) {
                 $a = ArrayHelper::getValue($this->attributes, $attribute, null);
@@ -68,7 +69,7 @@ class Mapping extends \yii\base\Widget {
                 }
                 
                 // automatic type extender detection
-                if (array_key_exists($attribute, $columns)) {
+                if (!in_array($attribute, $attributes) && array_key_exists($attribute, $columns)) {
                     switch($columns[$attribute]->type) {
                         case 'smallint':
                         case 'long':
@@ -106,7 +107,7 @@ class Mapping extends \yii\base\Widget {
         }
 
 
-        $js = $view->render('@x1/knockout/views/mapping/_init', [
+        $js = $view->render('@x1/knockout/views/mapping/prototype', [
             'namespace'  => $this->namespace,
             ]);
         $view->registerJs($js, \yii\web\View::POS_END);
