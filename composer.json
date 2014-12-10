@@ -15,7 +15,7 @@
         "yiisoft/yii2": "*"
     },
     "autoload": {
-        "psr-4": { "x1\\knockout\\": "" }
+        "psr-0": { "x1\\knockout\\": "" }
     },
     "target-dir": "x1/knockout"
 }
