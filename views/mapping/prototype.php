@@ -2,21 +2,20 @@ var <?= $namespace ?> = <?= $namespace ?> || {
 	prototype: function() {
 		var self = this;
 
-		this.init = function() {
+		self.init = function() {
 			// add errors for obserable arrays
-			for (key in this) {
-				if (this[key] && this[key].isObservableArray) {
-					this[key] = this[key].extend({arrayError: true});
+			for (key in self) {
+				if (self.hasOwnProperty(key) && self[key] && self[key].isObservableArray) {
+					self[key] = self[key].extend({arrayError: true});
 				}
 			}
 		}
-		this.init();
 
 
 		// return error for property
-		this.hasError = ko.pureComputed(function() {
-			for (key in this) {
-				if (this[key] && this[key].hasError && this[key].hasError() == true) {
+		self.hasError = ko.pureComputed(function() {
+			for (key in self) {
+				if (self[key] && self[key].hasError && self[key].hasError() == true) {
 					return true;
 				}
 			}
@@ -25,27 +24,34 @@ var <?= $namespace ?> = <?= $namespace ?> || {
 
 
 		// set errors (from ajax response)
-		this.setErrors =  function(data) {
-			for (key in data) {
+		self.setErrors =  function(data) {
+
+			for (var key in data) {
 			    if (data.hasOwnProperty(key)) {
-			        if (this[key]) {
-				        if (this[key].isObservableArray) {
-				        	var a = ko.unwrap(this[key]);
+			        if (self[key]) {
+				        if (self[key].isObservableArray) {
+				        	var a = ko.unwrap(self[key]);
 				        	if (a.length == data[key].length) {
 								for (i=0; i < a.length; i++) {
-									a[i].setErrors(data[key][i]);
+									if (a[i].setErrors)
+										a[i].setErrors(data[key][i]);
 								}
 				        	} else {
 				        		// wrong item count
 				        	}
 				        } else {
-							this[key].errors(data[key]);
+				        	if (self[key].errors)
+								self[key].errors(data[key]);
 				        }
 			        }
 			    }
 			}
 		}
 
+
+		self.test = function() {
+			console.log(self.__ko_mapping__)
+		}
 
 	},
 };
