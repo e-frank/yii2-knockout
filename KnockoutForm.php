@@ -14,11 +14,12 @@ class KnockoutForm extends \yii\base\Widget {
 
     public static $autoIdPrefix = 'x1Knockout';
 
-    public $name     = '';
-    public $model    = null;
-    public $class    = null;
-    public $scenario = 'default';
-    public $base     = [];
+    public $name      = '';
+    public $model     = null;
+    public $class     = null;
+    public $scenario  = 'default';
+    public $base      = [];
+    public $viewmodel = null;
 
     public static function begin($config = [])
     {
@@ -128,6 +129,17 @@ class KnockoutForm extends \yii\base\Widget {
 
         // if (!empty($this->createContent) && empty($this->createButton))
         //     throw new \yii\base\InvalidConfigException("Expecting 'createButton' property of " . get_class($this));
+
+        if (!empty($this->viewmodel)) {
+            $view = $this->view;
+            if (empty($this->model))
+                $data = [];
+            else  
+                $data = $this->model->toArray();
+            $view->registerJs(sprintf('//ko.applyBindings(ko.mapping.fromJS(%s, %s), document.getElementById("%s"));', Json::encode($data, JSON_FORCE_OBJECT), $this->viewmodel, $this->id));
+            $view->registerJs(sprintf('//ko.applyBindings(ko.mapping.fromJS(%s, %s));', Json::encode($data, JSON_FORCE_OBJECT), $this->viewmodel, $this->id));
+            $view->registerJs(sprintf('console.log(ko.dataFor(document.getElementById("%s")));', $this->id));
+        }
     }
 
 

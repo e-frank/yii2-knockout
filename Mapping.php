@@ -55,15 +55,27 @@ class Mapping extends \yii\base\Widget {
                     $a = ArrayHelper::getValue($a, 'validators', null);
 
                 if (empty($a)) {
-                    $validators = $this->model->getActiveValidators($attribute);
-                    array_walk($validators, function(&$item, $key, $data) {
-                        $item = $item->clientValidateAttribute($data['model'], $key, $data['view']);
-                    }, ['view' => $view, 'model' => $this->model]);
+                    $model_validators = $this->model->getActiveValidators($attribute);
 
+                    $validators = [];
+                    foreach ($model_validators as $validator) {
+                        foreach ($validator->attributes as $attribute) {
+                            $js = $validator->clientValidateAttribute($this->model, $attribute, $view);
+                            if (!empty($js)) {
+                                if (!isset($validators[$attribute]))
+                                    $validators[$attribute] = [];
+                                $validators[$attribute][] = $js;
+                            }
+                        }
+                    }
                     $validators = array_filter($validators);
+
+                    
+
+
                     if (!empty($validators)) {
                         $this->attributes[$attribute] = [
-                            'validators' => new JsExpression(sprintf('function(value, messages) {%s}', implode('', $validators))),
+                            'validators' => new JsExpression(sprintf('function(value, messages) {%s}', implode('', $validators[$attribute]))),
                         ];
                     }
                 }
