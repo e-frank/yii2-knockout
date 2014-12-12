@@ -179,9 +179,13 @@ class Mapping extends \yii\base\Widget {
                 'full'   => 0, // IntlDateFormatter::FULL,
             ];
 
-            $fmt        = new \IntlDateFormatter($locale, $shortFormats[Yii::$app->formatter->dateFormat], \IntlDateFormatter::NONE, Yii::$app->formatter->timeZone);
-            $dateFormat = $fmt->getPattern();
-            $date       = \yii\helpers\FormatConverter::convertDateIcuToPhp($dateFormat);
+            if (extension_loaded('intl')) {
+                $fmt        = new \IntlDateFormatter($locale, $shortFormats[Yii::$app->formatter->dateFormat], \IntlDateFormatter::NONE, Yii::$app->formatter->timeZone);
+                $dateFormat = $fmt->getPattern();
+                $date       = \yii\helpers\FormatConverter::convertDateIcuToPhp($dateFormat);
+            } else {
+                $date = 'yyyy-MM-dd';
+            }
 
             self::$defaultFormats[self::DATE] = $date;
         }
