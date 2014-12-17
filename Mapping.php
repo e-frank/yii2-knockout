@@ -190,9 +190,9 @@ class Mapping extends \yii\base\Widget {
             self::$defaultFormats[self::DATE] = $date;
         }
 
-
-        if (empty($this->name))
-            $this->name = $this->id;
+        if (empty($this->name)) {
+            $this->name = empty($this->model) ? $this->id : lcfirst($this->model->formName());
+        }
 
     }
 }
