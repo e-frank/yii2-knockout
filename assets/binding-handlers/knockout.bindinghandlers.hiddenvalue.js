@@ -7,12 +7,16 @@ ko.bindingHandlers.hiddenValue	= {
 		var current  = $(element).val();
 		var value    = valueAccessor();
 
-		value(current);
+		if (value.assign)
+			value.assign(current);
+		else
+			value(current);
+		
 		ko.applyBindingsToNode(element, { value : value });
 
-		value.subscribe(function () {
-            $(element).trigger('change');
-            console.log('change');
-        });
-	}
+		// value.subscribe(function () {
+  //           $(element).trigger('change');
+  //       });
+	},
+
 }
