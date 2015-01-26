@@ -22,35 +22,35 @@ class KnockoutAsset extends \yii\web\AssetBundle
 
 	public $js         = [
 		'knockout.js' => 'knockout-3.2.0.js',
-		'knockout.base.js',
+		'knockout.base.min.js',
 
-		'binding-handlers/knockout.bindinghandlers.checkbox.js',
-		'binding-handlers/knockout.bindinghandlers.fadein.js',
-		'binding-handlers/knockout.bindinghandlers.hiddenvalue.js',
-		'binding-handlers/knockout.bindinghandlers.js',
-		'binding-handlers/knockout.bindinghandlers.typeahead.js',
-		
-		'extenders/knockout.extender.display.js',
-		'extenders/knockout.extender.errors.js',
-		'extenders/knockout.extender.validators.js',
-		'extenders/knockout.extender.datetime.js',
-		'extenders/knockout.extender.decimal.js',
-		'extenders/knockout.extender.component.js',
-		'extenders/knockout.extender.list.js',
-		'extenders/knockout.extender.lookup.js',
-		'extenders/knockout.extender.subscribe.js',
-		'extenders/knockout.extender.array-error.js',
+		'binding-handlers/knockout.bindinghandlers.checkbox.js'    => 'binding-handlers/knockout.bindinghandlers.checkbox.min.js',
+		'binding-handlers/knockout.bindinghandlers.fadein.js'      => 'binding-handlers/knockout.bindinghandlers.fadein.min.js',
+		'binding-handlers/knockout.bindinghandlers.hiddenvalue.js' => 'binding-handlers/knockout.bindinghandlers.hiddenvalue.min.js',
+		// 'binding-handlers/knockout.bindinghandlers.js'          => // 'binding-handlers/knockout.bindinghandlers.min.js',
+		'binding-handlers/knockout.bindinghandlers.typeahead.js'   => 'binding-handlers/knockout.bindinghandlers.typeahead.min.js',
 
-		'knockout.mapping.js',
-		// 'mappings/knockout.mapping.base.js',
+		'extenders/knockout.extender.display.js'                   => 'extenders/knockout.extender.display.min.js',
+		// 'extenders/knockout.extender.errors.js'                 => // 'extenders/knockout.extender.errors.min.js',
+		'extenders/knockout.extender.validators.js'                => 'extenders/knockout.extender.validators.min.js',
+		'extenders/knockout.extender.datetime.js'                  => 'extenders/knockout.extender.datetime.min.js',
+		'extenders/knockout.extender.decimal.js'                   => 'extenders/knockout.extender.decimal.min.js',
+		// 'extenders/knockout.extender.component.js'              => // 'extenders/knockout.extender.component.min.js',
+		// 'extenders/knockout.extender.list.js'                   => // 'extenders/knockout.extender.list.min.js',
+		// 'extenders/knockout.extender.lookup.js'                 => // 'extenders/knockout.extender.lookup.min.js',
+		'extenders/knockout.extender.subscribe.js'                 => 'extenders/knockout.extender.subscribe.min.js',
+		'extenders/knockout.extender.array-error.js'               => 'extenders/knockout.extender.array-error.min.js',
+		'extenders/knockout.extender.select.js'                    => 'extenders/knockout.extender.select.min.js',
+		'knockout.mapping.js'                                      => 'knockout.mapping.js',
 
-		'sortable/jquery-ui.min.js',
-		'sortable/jquery-ui.touchpunch.js',
-		'sortable/knockout-sortable.min.js',
+		'sortable/jquery-ui.min.js'                                => 'sortable/jquery-ui.min.js',
+		'sortable/jquery-ui.touchpunch.js'                         => 'sortable/jquery-ui.touchpunch.js',
+		'sortable/knockout-sortable.min.js'                        => 'sortable/knockout-sortable.min.js',
 	];
 
 	public $depends = [
 		'x1\knockout\MomentAsset',
+		'yii\validators\ValidationAsset',
         // 'efrank\knockout\assets\HandleBarsAsset',
         // 'efrank\knockout\assets\TypeaheadAsset',
 	];

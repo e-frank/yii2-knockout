@@ -5,6 +5,7 @@ use Yii;
 use yii\helpers\Html;
 use yii\helpers\Json;
 use yii\helpers\ArrayHelper;
+use yii\helpers\StringHelper;
 use yii\web\JsExpression;
 use yii\web\View;
 use yii\helpers\Url;
@@ -70,15 +71,6 @@ class KnockoutForm extends \yii\base\Widget {
     }
 
 
-
-    private function endsWith($haystack, $needle) {
-        $length = strlen($needle);
-        if ($length == 0) {
-            return true;
-        }
-        return (substr($haystack, -$length) === $needle);        
-    }
-
     public function field($model, $attribute, $options = []) {
         $splits = explode('.', $attribute);
 
@@ -88,7 +80,7 @@ class KnockoutForm extends \yii\base\Widget {
 
         foreach ($splits_r as $key => $value) {
             $idx++;
-            if ($this->endsWith($value, '[]')) {
+            if (StringHelper::endsWith($value, '[]')) {
                 $c++;
                 $s              = (($c > 1) ? str_repeat('$parentContext.', $c - 1) : '') . '$index()';
                 $value          = '[' . str_replace('[]', '', $value) . ']' . '[\' + '.$s. ' + \']';

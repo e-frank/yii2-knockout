@@ -27,6 +27,7 @@ class Mapping extends \yii\base\Widget {
     public $formats    = [];
     public $attributes = [];
     public $timeout    = 3000;
+    public $duration   = 86400;
 
     public static function widget($config = []) {
         parent::widget($config);
@@ -37,29 +38,61 @@ class Mapping extends \yii\base\Widget {
      */
     public function run()
     {
-        $view = $this->getView();
+        $view  = $this->getView();
+        $cache = Yii::$app->cache;
+
+        // register global prototype per namespace
+        if (!($js = $cache->get($id = [self::$autoIdPrefix, 'prototype', $this->namespace]))) {
+            $js = $view->render('@x1/knockout/views/mapping/prototype', [
+                'namespace'  => $this->namespace,
+                ]);
+            $cache->set($id, $js, $this->duration);
+        }
+        $view->registerJs($js, \yii\web\View::POS_END);
+
+        if (!($js = $cache->get($id = [$this->id, 'mapping', Yii::$app->language, $this->namespace, $this->name]))) {
 
 
-        //
-        //  detect validators and type extenders from model definition
-        //
-        if (!empty($this->model)) {
+            //
+            //  detect validators and type extenders from model definition
+            //
+            if (!empty($this->model)) {
 
-            $formats    = ArrayHelper::merge(self::$defaultFormats, $this->formats);
-            $columns    = method_exists($this->model, 'getTableSchema') ? $this->model->getTableSchema()->columns : [];
-            $attributes = array_keys($this->attributes);
 
-            foreach ($this->model->safeAttributes() as $attribute) {
-                $a = ArrayHelper::getValue($this->attributes, $attribute, null);
-                if (!empty($a))
-                    $a = ArrayHelper::getValue($a, 'validators', null);
+                $formats    = ArrayHelper::merge(self::$defaultFormats, $this->formats);
+                $columns    = method_exists($this->model, 'getTableSchema') ? $this->model->getTableSchema()->columns : [];
+                $attributes = array_keys($this->attributes);
 
-                if (empty($a)) {
-                    $model_validators = $this->model->getActiveValidators($attribute);
+                //
+                //  create 1:1 relations as observables
+                //
+                if (!empty($this->attributes)) {
+                    foreach ($this->attributes as $key => $value) {
+                        $rel = $this->model->getRelation($key, false);
+                        if ($rel !== null && !$rel->multiple) {
+                            $this->attributes[$key]['observable'] = true;
+                        }
+                    }
+                }
 
-                    $validators = [];
-                    foreach ($model_validators as $validator) {
-                        foreach ($validator->attributes as $attribute) {
+
+                $attrs      = ArrayHelper::merge(array_keys($this->model->getPrimaryKey(true)), $this->model->safeAttributes());
+
+
+                // foreach ($this->model->safeAttributes() as $attribute) {
+                foreach ($attrs as $attribute) {
+
+                    $a = ArrayHelper::getValue($this->attributes, $attribute, null);
+                    if (!empty($a))
+                        $a = ArrayHelper::getValue($a, 'validators', null);
+
+
+                    if (empty($a)) {
+                        $model_validators = $this->model->getActiveValidators($attribute);
+                 
+
+                        $validators = [];
+                        foreach ($model_validators as $validator) {
                             $js = $validator->clientValidateAttribute($this->model, $attribute, $view);
                             if (!empty($js)) {
                                 if (!isset($validators[$attribute]))
@@ -67,72 +100,64 @@ class Mapping extends \yii\base\Widget {
                                 $validators[$attribute][] = $js;
                             }
                         }
-                    }
-                    $validators = array_filter($validators);
+                        $validators = array_filter($validators);
 
+
+                        if (!empty($validators)) {
+                            $this->attributes[$attribute]['validators'] = new JsExpression(sprintf('function(value, messages) {%s}', implode('', $validators[$attribute])));
+                        }
+                    }
                     
-
-
-                    if (!empty($validators)) {
-                        $this->attributes[$attribute] = [
-                            'validators' => new JsExpression(sprintf('function(value, messages) {%s}', implode('', $validators[$attribute]))),
-                        ];
-                    }
-                }
-                
-                // automatic type extender detection
-                if (!in_array($attribute, $attributes) && array_key_exists($attribute, $columns)) {
-                    switch($columns[$attribute]->type) {
-                        case 'smallint':
-                        case 'long':
-                        case 'integer':
-                        {                   
-                            $this->attributes[$attribute]['decimal'] = ['decimals' => 0, 'thousandsSeparator' => $formats['thousandsSeparator']];
-                            break;
-                        }
-                        case 'decimal':
-                        {
-                            preg_match('|^decimal\(\d+,(\d+)\)$|i', $columns[$attribute]->dbType, $matches);
-                            $this->attributes[$attribute]['decimal'] = ['decimals' => $matches[1], 'thousandsSeparator' => $formats['thousandsSeparator'], 'decimalSeparator' => $formats['decimalSeparator']];
-                            break;
-                        }
-                        case 'date':
-                        {
-                            $this->attributes[$attribute]['date'] = ['format' => DateFormatConverter::convertPhpToMoment($formats['date']), 'time' => false];
-                            break;
-                        }
-                        case 'datetime':
-                        {
-                            $this->attributes[$attribute]['datetime'] = ['format' => DateFormatConverter::convertPhpToMoment($formats['date']), 'time' => true];
-                            break;
-                        }
-                        default:
-                        {
-                            $this->attributes[$attribute]['display'] = true;
-                            break;
+                    // automatic type extender detection
+                    if (!in_array($attribute, $attributes) && array_key_exists($attribute, $columns)) {
+                        switch($columns[$attribute]->type) {
+                            case 'smallint':
+                            case 'long':
+                            case 'integer':
+                            {                   
+                                $this->attributes[$attribute]['decimal'] = ['decimals' => 0, 'thousandsSeparator' => $formats['thousandsSeparator']];
+                                break;
+                            }
+                            case 'decimal':
+                            {
+                                preg_match('|^decimal\(\d+,(\d+)\)$|i', $columns[$attribute]->dbType, $matches);
+                                $this->attributes[$attribute]['decimal'] = ['decimals' => $matches[1], 'thousandsSeparator' => $formats['thousandsSeparator'], 'decimalSeparator' => $formats['decimalSeparator']];
+                                break;
+                            }
+                            case 'date':
+                            {
+                                $this->attributes[$attribute]['date'] = ['format' => DateFormatConverter::convertPhpToMoment($formats['date']), 'time' => false];
+                                break;
+                            }
+                            case 'datetime':
+                            {
+                                $this->attributes[$attribute]['datetime'] = ['format' => DateFormatConverter::convertPhpToMoment($formats['date']), 'time' => true];
+                                break;
+                            }
+                            default:
+                            {
+                                $this->attributes[$attribute]['display'] = true;
+                                break;
+                            }
                         }
                     }
+
                 }
-                // $view->registerJs( 'XXXXXX', \yii\web\View::POS_END);
-                // $view->registerJs( print_r($this->attributes, true), \yii\web\View::POS_END);
             }
+
+
+
+            $js = $view->render('@x1/knockout/views/mapping/mapping', [
+                'namespace'  => $this->namespace,
+                'name'       => $this->name,
+                'mapping'    => $this->mapping,
+                'attributes' => $this->attributes,
+                'model'      => $this->model,
+                ]);
+            $cache->set($id, $js, $this->duration);
         }
-
-
-        $js = $view->render('@x1/knockout/views/mapping/prototype', [
-            'namespace'  => $this->namespace,
-            ]);
         $view->registerJs($js, \yii\web\View::POS_END);
 
-
-        $js = $view->render('@x1/knockout/views/mapping/mapping', [
-            'namespace'  => $this->namespace,
-            'name'       => $this->name,
-            'mapping'    => $this->mapping,
-            'attributes' => $this->attributes,
-            'model'      => $this->model,
-            ]);
-        $view->registerJs($js, \yii\web\View::POS_END);
 
         $view->registerAssetBundle('x1\knockout\KnockoutAsset');
     }

@@ -90,7 +90,8 @@ ko.extenders.decimal = function (target, options) {
 		decimals:           2,
 		decimalSeparator:   ko.extenders.decimalSeparator,
 		thousandsSeparator: ko.extenders.thousandsSeparator,
-		nullable:           true
+		nullable:           true,
+		percent: 			false
 	}, options);
 	
 	// if (options.thousandsSeparator == null) {
@@ -107,7 +108,7 @@ ko.extenders.decimal = function (target, options) {
 			var t = target();
 
 			if ($.isNumeric(t)) {
-				return number_format(t, options.decimals, options.decimalSeparator, options.thousandsSeparator);
+				return options.percent ? number_format(t * 100, options.decimals, options.decimalSeparator, options.thousandsSeparator) : number_format(t, options.decimals, options.decimalSeparator, options.thousandsSeparator);
 			} else {
 				if (options.nullable)
 					return '';
@@ -120,9 +121,10 @@ ko.extenders.decimal = function (target, options) {
 			v = v.replace(options.decimalSeparator, '.');
 			var t = parseFloat(v);
 			var value;
-			if ($.isNumeric(t))
-				value = t.toFixed(options.decimals); 
-			else {
+			if ($.isNumeric(t)) {
+				t     = options.percent ? t / 100 : t;
+				value = t.toFixed(options.decimals + options.percent ? 2 : 0); 
+			} else {
 				if (options.nullable)
 					value = '';
 				else

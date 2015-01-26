@@ -5,6 +5,7 @@ ko.extenders.validators = function (target, options) {
 	// 	fn:              null,
 	// }, options);
 
+	target.isSetting = false;
 	target.validated = ko.observable(false);
 	target.errors    = ko.observableArray([]);
 	target.hasError  = ko.computed(function() {
@@ -19,20 +20,24 @@ ko.extenders.validators = function (target, options) {
 		if (options)
 			options(value, messages);
 		
-		if (messages.length > 0) {
-			target.validated(false);
-		} else {
-			target.validated(true);
-		}
+		target.validated(true);
 		target.errors(messages);
+	}
+
+	//	if assigning, skip validating and reset errors
+	target.assign = function(v) {
+		target.isSetting = true;
+		target(v);
+		target.validated(false);
+		target.errors([]);
+		target.isSetting = false;
 	}
 
 	// validate only if not setting object
 	target.subscribe(function(v) {
-		target.validate();
-		// if (!(ko.unwrap(options.abortValidation) || false)) {
-		// 	target.validate();
-		// }
+		if (!target.isSetting) {
+			target.validate();
+		}
 	});
 
 	return target;
