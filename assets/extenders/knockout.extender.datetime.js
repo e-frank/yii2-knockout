@@ -32,6 +32,8 @@ ko.extenders.minutes = [
 					{	key:	45,	value:	'45'}
 				];
 
+ko.extenders.date_db = 'YYYY-MM-DD HH:mm:ss';
+
 ko.extenders.datetime = function (target, options) {
 
 	target.minutes = ko.extenders.minutes;
@@ -40,22 +42,23 @@ ko.extenders.datetime = function (target, options) {
 
 	//	default options
 	options	=	$.extend({
-		utc		:	false,
-		date	:	true,
-		datetime:	false,
-		year	:	false,
-		month	:	false,
-		day		:	false,
-		hour	:	false,
-		minute	:	false,
-		time	:	false,
-		round	:	true,
-		format  :   'YYYY-MM-DD',
-		null	:	true
+		utc:      false,
+		date:     true,
+		datetime: false,
+		year:     false,
+		month:    false,
+		day:      false,
+		hour:     false,
+		minute:   false,
+		time:     false,
+		round:    true,
+		format:   'YYYY-MM-DD',
+		timespan: 15,
+		null:     true
 	}, options);
 	
 	//	moment display format
-	var date_db        = 'YYYY-MM-DD HH:mm:ss';
+	var date_db        = ko.extenders.date_db;
 	
 
 	// get moment and choose UTC or LOCAL
@@ -66,7 +69,7 @@ ko.extenders.datetime = function (target, options) {
 			
 			//	round to quarters
 			if (options.round && m && m.isValid()) {
-				m.minute( m.minute() - m.minute() % 15);
+				m.minute( m.minute() - m.minute() % options.timespan);
 				m.second(0);
 			}
 			
@@ -122,7 +125,7 @@ ko.extenders.datetime = function (target, options) {
 
 							//	round to quarters
 							if (options.round && m && m.isValid()) {
-								m.minute(m.minute() - m.minute() % 15);
+								m.minute(m.minute() - m.minute() % options.timespan);
 								m.second(0);
 							}
 							
@@ -189,7 +192,7 @@ ko.extenders.datetime = function (target, options) {
 					m.minutes(v);
 							//	round to quarters
 							if (options.round) {
-								m.minute( m.minute() - m.minute() % 15);
+								m.minute( m.minute() - m.minute() % options.timespan);
 							}
 							target(m.format(date_db));
 						} else
@@ -250,7 +253,7 @@ ko.extenders.datetime = function (target, options) {
 		target(getMoment(moment().format(date_db)).format(date_db));
 		// var m = moment();
 		// if (options.round && m && m.isValid()) {
-		// 	m.minute(m.minute() - m.minute() % 15);
+		// 	m.minute(m.minute() - m.minute() % options.timespan);
 		// 	m.second(0);
 		// }
 		// target(m.format(date_db));
@@ -270,22 +273,23 @@ ko.extenders.date = function (target, options) {
 
 	//	default options
 	options	=	$.extend({
-		utc		:	false,
-		date	:	true,
-		datetime:	false,
-		year	:	false,
-		month	:	false,
-		day		:	false,
-		hour	:	false,
-		minute	:	false,
-		time	:	false,
-		round	:	false,
-		format  :   'YYYY-MM-DD',
-		null	:	true
+		utc:      false,
+		date:     true,
+		datetime: false,
+		year:     false,
+		month:    false,
+		day:      false,
+		hour:     false,
+		minute:   false,
+		time:     false,
+		round:    false,
+		format:   'YYYY-MM-DD',
+		timespan: 15,
+		null:     true
 	}, options);
 	
 	//	moment display format
-	var date_db        = 'YYYY-MM-DD HH:mm:ss';
+	var date_db        = ko.extenders.date_db;
 	
 
 	// get moment and choose UTC or LOCAL
@@ -296,7 +300,7 @@ ko.extenders.date = function (target, options) {
 			
 			//	round to quarters
 			if (options.round && m && m.isValid()) {
-				m.minute( m.minute() - m.minute() % 15);
+				m.minute( m.minute() - m.minute() % options.timespan);
 				m.second(0);
 			}
 			
@@ -341,7 +345,7 @@ ko.extenders.date = function (target, options) {
 
 							//	round to quarters
 							if (options.round && m && m.isValid()) {
-								m.minute( m.minute() - m.minute() % 15);
+								m.minute( m.minute() - m.minute() % options.timespan);
 								m.second(0);
 							}
 							
