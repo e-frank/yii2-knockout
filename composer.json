@@ -1,6 +1,6 @@
 {
     "name":        "e-frank/yii2-knockout",
-    "description": "Widget for creating Knockout viewmodels from yii ActiveRecords",
+    "description": "ActiveForm replacement. Automatically generates knockoutjs viewmodels from yii ActiveRecords",
     "keywords":    ["yii", "knockout"],
     "type":        "yii2-extension",
     "license":     "BSD-3-Clause",
@@ -12,10 +12,10 @@
     ],
     "require": {
         "yiisoft/yii2":  "*",
-        "moment/moment": "*"
+        "e-frank/yii2-base": "*",
+        "e-frank/yii2-moment": "*"
     },
     "autoload": {
-        "psr-0": { "x1\\knockout\\": "" }
+        "psr-4": { "x1\\knockout\\": "" }
     },
-    "target-dir": "x1/knockout"
 }

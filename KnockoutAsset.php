@@ -20,9 +20,12 @@ class KnockoutAsset extends \yii\web\AssetBundle
 	public $css = [
 	];
 
+	// TODO: knockout.base
+
 	public $js         = [
-		'knockout.js' => 'knockout-3.2.0.js',
-		'knockout.base.min.js',
+		'knockout.js' => 'knockout-3.3.0.js',
+		// 'knockout.base.js',
+		'knockout.config.js',
 
 		'binding-handlers/knockout.bindinghandlers.checkbox.js'    => 'binding-handlers/knockout.bindinghandlers.checkbox.min.js',
 		'binding-handlers/knockout.bindinghandlers.fadein.js'      => 'binding-handlers/knockout.bindinghandlers.fadein.min.js',
@@ -42,6 +45,7 @@ class KnockoutAsset extends \yii\web\AssetBundle
 		'extenders/knockout.extender.array-error.js'               => 'extenders/knockout.extender.array-error.min.js',
 		'extenders/knockout.extender.select.js'                    => 'extenders/knockout.extender.select.min.js',
 		'knockout.mapping.js'                                      => 'knockout.mapping.js',
+		'knockout.mapping.prototype.js',
 
 		'sortable/jquery-ui.min.js'                                => 'sortable/jquery-ui.min.js',
 		'sortable/jquery-ui.touchpunch.js'                         => 'sortable/jquery-ui.touchpunch.js',

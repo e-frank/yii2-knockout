@@ -32,7 +32,7 @@ ko.extenders.minutes = [
 					{	key:	45,	value:	'45'}
 				];
 
-ko.extenders.date_db = 'YYYY-MM-DD HH:mm:ss';
+ko.extenders.date_db     = 'YYYY-MM-DD';
 
 ko.extenders.datetime = function (target, options) {
 
@@ -58,7 +58,7 @@ ko.extenders.datetime = function (target, options) {
 	}, options);
 	
 	//	moment display format
-	var date_db        = ko.extenders.date_db;
+	var date_db        = ko.extenders.date_db + ((options.time) ? ' HH:mm:ss' : '');
 	
 
 	// get moment and choose UTC or LOCAL

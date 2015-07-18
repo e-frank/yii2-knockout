@@ -1,2 +1,0 @@
-</form>
-<!-- knockoutForm end -->
