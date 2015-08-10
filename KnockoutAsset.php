@@ -61,7 +61,7 @@ class KnockoutAsset extends \yii\web\AssetBundle
 		// 'x1\knockout\ValidationAsset',
 		// 'x1\assets\RequireAsset',
 
-		'x1\assets\MomentAsset',
+		'x1\moment\MomentAsset',
 		'yii\validators\ValidationAsset',
 		// 'x1\knockout\RequireAsset',
         // 'efrank\knockout\assets\HandleBarsAsset',
