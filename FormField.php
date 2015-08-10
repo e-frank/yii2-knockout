@@ -125,7 +125,7 @@ class FormField extends \yii\base\Component {
     }
 
     public function textArea($options = []) {
-        return $this->widget(\x1\input\Textarea::className(), $options);
+        return $this->widget(\x1\knockout\input\Textarea::className(), $options);
         return $this;
     }
 

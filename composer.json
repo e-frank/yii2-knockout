@@ -1,18 +1,19 @@
 {
     "name":        "e-frank/yii2-knockout",
-    "description": "ActiveForm replacement. Automatically generates knockoutjs viewmodels from yii ActiveRecords",
+    "description": "ActiveForm replacement. Automatically generates knockoutjs viewmodels from yii ActiveRecords. Allows computed fields and nested forms.",
     "keywords":    ["yii", "knockout"],
     "type":        "yii2-extension",
     "license":     "BSD-3-Clause",
     "authors": [
         {
             "name":     "Elmar Frank",
-            "homepage": "http://efrank.at"
+            "homepage": "http://yii.efrank.at/extension/knockout"
         }
     ],
     "require": {
         "yiisoft/yii2":  "*",
         "e-frank/yii2-base": "*",
+        "e-frank/yii2-datetimepicker": "*",
         "e-frank/yii2-moment": "*"
     },
     "autoload": {

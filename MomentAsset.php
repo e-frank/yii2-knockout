@@ -1,30 +1,34 @@
 <?php
 /**
- * @link http://www.yiiframework.com/
- * @copyright Copyright (c) 2008 Yii Software LLC
- * @license http://www.yiiframework.com/license/
+ * @copyright Elmar Frank 2015
  */
 
 namespace x1\knockout;
 
-/**
- * This asset bundle provides the base javascript files for the Yii Framework.
- *
- * @author Elmar Frank
- * @since 1.0
- */
 class MomentAsset extends \yii\web\AssetBundle
 {
 	public $sourcePath = '@vendor/moment/moment/min';
 
-	public $css = [
-	];
+	// public $js         = [
+	// 	'moment.js' => 'moment-with-locales.min.js',
+	// ];
 
-	public $js         = [
-		'moment.js' => 'moment.min.js',
+	public $require = [
+		'map' => [
+			// 'moment'        => 'moment-with-locales.min',
+			// 'moment-asset/moment' => 'moment-asset/moment-with-locales.min',
+			// 'moment/moment' => 'moment-asset/moment-with-locales.min',
+		],
+		'path' => [
+			'moment-asset/moment'          => 'moment-asset/moment-with-locales.min',
+			// 'moment-asset/moment' => 'moment-asset/moment-with-locales.min',
+			// 'moment/moment'    => 'moment-with-locales.min',
+		],
+		// 'shim' => [
+		// 	'moment' => [
+		// 		'exports' => 'moment', 
+		// 		// 'deps'    => []
+		// 	],
+		// ]
 	];
-
-	public $depends = [
-	];
-
 }

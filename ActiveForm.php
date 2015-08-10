@@ -35,13 +35,13 @@ class ActiveForm extends \yii\base\Widget {
         // echo Html::beginTag('form', ArrayHelper::merge(['action' => Url::current()], ['id' => 123], ArrayHelper::getValue($config, 'options', []), ['id' => $w->id, 'method' => 'POST', 'enctype' => 'multipart/form-data']));
         echo Html::beginForm($w->action, 'post', ArrayHelper::merge(['id' => 123], ArrayHelper::getValue($config, 'options', []), ['id' => $w->id, 'method' => 'POST', 'enctype' => 'multipart/form-data']));
 
-        \x1\base\ConfigAsset::register($view);
+        KnockoutAsset::register($view);
         $view->registerJs(sprintf(<<<EOD
 var %1\$s = $.extend({}, x1.config, %2\$s);
 
 console.log(%1\$s)
 EOD
-, $w->id, Json::encode($w->defaults)));
+, lcfirst(\yii\helpers\Inflector::camelize($w->id)), Json::encode($w->defaults)));
         return $w;
     }
 
@@ -126,8 +126,6 @@ EOD
         $this->walkLevel($this->structure, [], $mapping);
 
         $this->view->registerJs(sprintf('var %s=%s;', $this->namespace, Json::encode($mapping)), View::POS_END);
-
-        var_dump($this->structure);
     }
 
     public function walkLevel($structure, $path = [], &$mapping = []) {
@@ -177,9 +175,14 @@ EOD
     }
 
     public function bind($data = null) {
-        // $this->view->registerJs('console.log("mapping", mapping);', View::POS_READY);
+        $this->view->registerJs('console.log("mapping", mapping);', View::POS_READY);
+        // $this->view->registerJs(sprintf('require(["ko"], function(ko) { ko.applyBindings(vm = ko.mapping.fromJS(%1$s, %2$s), document.getElementById("%3$s"));
+        //     // vm.setErrors({title: ["asd"], test2s:{0: ["xxx"]}}); // Form.php // sam was here xxx
+        // })', Json::encode($data), $this->namespace, $this->id), View::POS_READY);
+
         $this->view->registerJs(sprintf('ko.applyBindings(vm = ko.mapping.fromJS(%1$s, %2$s), document.getElementById("%3$s"));
             // vm.setErrors({title: ["asd"], test2s:{0: ["xxx"]}}); // Form.php // sam was here xxx
+            // console.log("viewmodel", vm);
         ', Json::encode($data), $this->namespace, $this->id), View::POS_READY);
     }
 

@@ -10,25 +10,28 @@ use yii\web\View;
 use yii\helpers\Url;
 
 
-class Textarea extends \yii\widgets\InputWidget {
+class Decimal extends BaseDecimalInput {
+	public static $autoIdPrefix = 'x1Decimal';
 
-	public static $autoIdPrefix = 'x1Textarea';
-	
-	public $cols = null;
-	public $rows = null;
+	public $size      = null;
+	public $maxlength = 9;
 
 	public function run() {
-		return $this->view->render('@x1/knockout/input/views/textarea/textarea', [
+		return $this->view->render('@x1/knockout/input/views/decimal/decimal', [
 			'id'        => $this->id,
 			'model'     => $this->model,
 			'attribute' => $this->attribute,
 			'name'      => $this->name,
 			'value'     => $this->value,
-			'rows'      => $this->rows,
-			'cols'      => $this->cols,
+			'maxlength' => $this->maxlength,
+			'size'      => $this->size,
+			'options'   => $this->options,
 		]);
 	}
 
+	public function init() {
+		parent::init();
+	}
 }
 
 ?>
