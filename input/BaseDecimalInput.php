@@ -26,6 +26,7 @@ abstract class BaseDecimalInput extends \yii\widgets\InputWidget {
 
 	// TODO: remove, unused?
 	public function run() {
+
 		$this->params = ArrayHelper::merge($this->params, [
 			'decimals'                => $this->decimals,
 			'percent'                 => $this->percent,
@@ -72,10 +73,11 @@ abstract class BaseDecimalInput extends \yii\widgets\InputWidget {
 	            self::$defaultFormats[self::THOUSANDS_SEPARATOR] = $thousand;
 	        }
 
-	        $this->decimalSeparator   = $decimal;
-	        $this->thousandsSeparator = $thousand;
+            if ($this->decimalSeparator == null)
+		        $this->decimalSeparator   = $decimal;
+            if ($this->thousandsSeparator == null)
+		        $this->thousandsSeparator = $thousand;
 		}
-
 
 	}
 

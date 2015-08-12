@@ -14,7 +14,7 @@ class Decimal extends BaseDecimalInput {
 	public static $autoIdPrefix = 'x1Decimal';
 
 	public $size      = null;
-	public $maxlength = 9;
+	public $maxlength = 15;
 
 	public function run() {
 		return $this->view->render('@x1/knockout/input/views/decimal/decimal', [

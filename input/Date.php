@@ -10,14 +10,14 @@ use yii\web\View;
 use yii\helpers\Url;
 
 
-class Decimal extends BaseDecimalInput {
-	public static $autoIdPrefix = 'x1Decimal';
+class Date extends \yii\widgets\InputWidget {
+	public static $autoIdPrefix = 'x1Date';
 
 	public $size      = null;
-	public $maxlength = 9;
+	public $maxlength = 10;
 
 	public function run() {
-		return $this->view->render('@x1/knockout/input/views/decimal/decimal', [
+		return $this->view->render('@x1/knockout/input/views/date/date', [
 			'id'        => $this->id,
 			'model'     => $this->model,
 			'attribute' => $this->attribute,
@@ -29,9 +29,6 @@ class Decimal extends BaseDecimalInput {
 		]);
 	}
 
-	public function init() {
-		parent::init();
-	}
 }
 
 ?>

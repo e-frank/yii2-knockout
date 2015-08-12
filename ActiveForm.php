@@ -24,7 +24,10 @@ class ActiveForm extends \yii\base\Widget {
     public $encodeErrorSummary   = true;
     public $errorSummaryCssClass = 'error-summary';
     public $defaults             = [
-        'decimals' => 2,
+        'date'               => 'YYYY-MM-DD',
+        'decimalSeparator'   => '.',
+        'thousandsSeparator' => ',',
+        'decimals'           => 2,
     ];
 
     public static function begin($config = [])

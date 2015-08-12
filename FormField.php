@@ -14,6 +14,11 @@ class FormField extends \yii\base\Component {
 
     public static $autoIdPrefix = 'knockoutFormField';
 
+    const DEFAULTS = [
+            'decimals' => 2,
+            'date'     => 'YYYY-MM-DD',
+            ];
+
     public $model         = null;
     public $attribute     = null;
     public $form          = null;
@@ -26,6 +31,7 @@ class FormField extends \yii\base\Component {
     public $labelOptions  = ['class'  => 'control-label'];
     public $hintOptions   = ['class'  => 'hint-block'];
     public $parts         = [];
+    public $defaults      = [];
 
 
     public function begin() {
@@ -81,6 +87,8 @@ class FormField extends \yii\base\Component {
     }
 
     public function init() {
+        $this->defaults = ArrayHelper::merge(self::DEFAULTS, $this->form->defaults, $this->defaults);
+
         if (!isset($this->extend['validators'])) {
             $model_validators = $this->model->getActiveValidators($this->attribute);
             $validators = [];
@@ -131,21 +139,27 @@ class FormField extends \yii\base\Component {
 
 
     public function date($options = []) {
-        $this->extend = ['datetime' => ['time' => false]];
-        return $this->widget(\x1\input\Date::className(), $options);
+        $this->extend = ['datetime' => ['time' => false, 'format' => $this->defaults['date']]];
+        if (isset($options['datetime']))
+            $this->extend = ArrayHelper::merge($this->extend, ['datetime' => ArrayHelper::remove($options, 'datetime')]);
+
+        return $this->widget(\x1\knockout\input\Date::className(), $this->options);
     }
 
     public function dateTime($options = []) {
-        $this->extend = ['datetime' => ['time' => true]];
-        return $this->widget(\x1\input\DateTime::className(), $options);
+        $this->extend = ['datetime' => ['time' => true, 'format' => $this->defaults['date']]];
+        if (isset($options['datetime']))
+            $this->extend = ArrayHelper::merge($this->extend, ['datetime' => ArrayHelper::remove($options, 'datetime')]);
+
+        return $this->widget(\x1\knockout\input\DateTime::className(), $this->options);
     }
 
     public function decimal($options = []) {
-        if (!isset($this->form->defaults['decimal']))
-            $this->form->defaults[__FUNCTION__] = ['decimals' => 2];
+        $this->extend = ['decimal' => ['decimals' => 2]];
+        if (isset($options['decimal']))
+            $this->extend = ArrayHelper::merge($this->extend, ['decimal' => ArrayHelper::remove($options, 'decimal')]);
 
-        $this->extend = ArrayHelper::merge(['decimal' => ['decimals' => 2]], $this->extend, ['decimal' => $options]);
-        return $this->widget(\x1\knockout\input\Decimal::className(), $options);
+        return $this->widget(\x1\knockout\input\Decimal::className(), $this->options);
     }
 
     
