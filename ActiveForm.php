@@ -12,6 +12,11 @@ use yii\helpers\Url;
 
 class ActiveForm extends \yii\base\Widget {
 
+    const DATE                = 'date';
+    const DECIMAL_SEPARATOR   = 'decimalSeparator';
+    const THOUSANDS_SEPARATOR = 'thousandsSeparator';
+    const DECIMALS            = 'decimals';
+
     public static $autoIdPrefix  = 'knockoutActiveForm';
 
     public $fieldClass           = 'x1\knockout\FormField';
@@ -24,16 +29,19 @@ class ActiveForm extends \yii\base\Widget {
     public $encodeErrorSummary   = true;
     public $errorSummaryCssClass = 'error-summary';
     public $defaults             = [
-        'date'               => 'YYYY-MM-DD',
-        'decimalSeparator'   => '.',
-        'thousandsSeparator' => ',',
-        'decimals'           => 2,
+        // self::DATE                => 'YYYY-MM-DD',
+        // self::DECIMAL_SEPARATOR   => '.',
+        // self::THOUSANDS_SEPARATOR => ',',
+        self::DECIMALS            => 2,
     ];
 
     public static function begin($config = [])
     {
-        $w    = parent::begin($config);
-        $view = $w->getView();
+        $defaults    = ArrayHelper::remove($config, 'defaults', []);
+        $w           = parent::begin($config);
+        $w->defaults = ArrayHelper::merge($w->defaults, $defaults);
+
+        $view     = $w->getView();
 
         // echo Html::beginTag('form', ArrayHelper::merge(['action' => Url::current()], ['id' => 123], ArrayHelper::getValue($config, 'options', []), ['id' => $w->id, 'method' => 'POST', 'enctype' => 'multipart/form-data']));
         echo Html::beginForm($w->action, 'post', ArrayHelper::merge(['id' => 123], ArrayHelper::getValue($config, 'options', []), ['id' => $w->id, 'method' => 'POST', 'enctype' => 'multipart/form-data']));
@@ -94,6 +102,7 @@ EOD
     }
 
     public function init() {
+        parent::init();
         // if (!empty($this->deleteContent) && empty($this->deleteButton))
         //     throw new \yii\base\InvalidConfigException("Expecting 'deleteButton' property of " . get_class($this));
 
@@ -127,6 +136,15 @@ EOD
         $mapping['_defaults'] = new JsExpression(Json::encode($this->defaults));
 
         $this->walkLevel($this->structure, [], $mapping);
+    
+//         $require = <<<EOD
+// define('%s', ['ko', 'prototype'], function(ko, proto) {
+//     var viewmodel       = %s;
+//     viewmodel.prototype = proto;
+//     return viewmodel;
+// })
+// EOD;
+//         $this->view->registerJs(sprintf($require, $this->namespace, Json::encode($mapping)), View::POS_END);        
 
         $this->view->registerJs(sprintf('var %s=%s;', $this->namespace, Json::encode($mapping)), View::POS_END);
     }
@@ -183,7 +201,11 @@ EOD
         //     // vm.setErrors({title: ["asd"], test2s:{0: ["xxx"]}}); // Form.php // sam was here xxx
         // })', Json::encode($data), $this->namespace, $this->id), View::POS_READY);
 
-        $this->view->registerJs(sprintf('ko.applyBindings(vm = ko.mapping.fromJS(%1$s, %2$s), document.getElementById("%3$s"));
+        $this->view->registerJs(sprintf('
+            ko.applyBindings(vm = ko.mapping.fromJS(%1$s, %2$s), document.getElementById("%3$s"));
+            // require(["ko"], function(ko) {
+            //     ko.applyBindings(vm = ko.mapping.fromJS(%1$s, %2$s), document.getElementById("%3$s"));
+            // });
             // vm.setErrors({title: ["asd"], test2s:{0: ["xxx"]}}); // Form.php // sam was here xxx
             // console.log("viewmodel", vm);
         ', Json::encode($data), $this->namespace, $this->id), View::POS_READY);
@@ -225,6 +247,12 @@ EOD
         Html::addCssClass($options, $this->errorSummaryCssClass);
         $options['encode'] = $this->encodeErrorSummary;
         return Html::errorSummary($models, $options);
+    }
+
+
+    public function submitButton($options = []) {
+        $text = ArrayHelper::getValue($options, 'text', Yii::t('app', 'Submit'));
+        return Html::submitButton('<i class="glyphicon" data-bind="css: {\'glyphicon-ok\': !hasError(), \'glyphicon-warning-sign\': hasError(), }"></i> ' . $text, ['class' => 'btn btn-primary', 'data-bind' => 'css: { \'btn-danger\': hasError() }, enable: !hasError()']);
     }
 
 }

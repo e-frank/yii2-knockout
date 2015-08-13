@@ -48,17 +48,25 @@ ko.extenders.datetime = function (target, options) {
 		minute:   false,
 		time:     false,
 		round:    true,
-		format:   'YYYY-MM-DD',
+		format:   x1.config.date,
 		timespan: 15,
+		language: x1.config.language,
 		null:     true
 	}, options);
+
 	
-	target.minutes = options.minutes || ko.extenders.minutes;
-	target.hours   = options.hours   || ko.extenders.hours;
+	options.minutes = [];
+	for (var i = 0; i < 60; i=i+options.timespan) {
+		options.minutes.push({ key: i, value: i.toString().lpad('0', 2) });
+	};
+
+
+	target.minutes  = options.minutes || ko.extenders.minutes;
+	target.hours    = options.hours   || ko.extenders.hours;
 
 
 	//	moment display format
-	var date_db        = ko.extenders.date_db + ((options.time) ? ' HH:mm:ss' : '');
+	var date_db     = ko.extenders.date_db + ((options.time) ? ' HH:mm:ss' : '');
 	
 
 	// get moment and choose UTC or LOCAL
@@ -66,8 +74,7 @@ ko.extenders.datetime = function (target, options) {
 		var result = null;
 		if (t && t != null && t != '') {
 			var m = ((options.utc == true) ? moment.utc(t, date_db).local() : moment(t, date_db));
-			m.locale(x1.config.language);
-			console.log('ko ext datetime', x1.config.language)
+			m.locale(options.language);
 
 			//	round to quarters
 			if (options.round && m && m.isValid()) {

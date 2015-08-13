@@ -10,14 +10,14 @@ use yii\web\View;
 use yii\helpers\Url;
 
 
-class Decimal extends BaseDecimalInput {
-	public static $autoIdPrefix = 'x1Decimal';
+class Percent extends BaseDecimalInput {
+	public static $autoIdPrefix = 'x1Percent';
 
 	public $size      = null;
-	public $maxlength = 15;
+	public $maxlength = 10;
 
 	public function run() {
-		return $this->view->render('@x1/knockout/input/views/decimal/decimal', [
+		return $this->view->render('@x1/knockout/input/views/decimal/percent', [
 			'id'        => $this->id,
 			'model'     => $this->model,
 			'attribute' => $this->attribute,

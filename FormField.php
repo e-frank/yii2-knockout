@@ -14,11 +14,6 @@ class FormField extends \yii\base\Component {
 
     public static $autoIdPrefix = 'knockoutFormField';
 
-    const DEFAULTS = [
-            'decimals' => 2,
-            'date'     => 'YYYY-MM-DD',
-            ];
-
     public $model         = null;
     public $attribute     = null;
     public $form          = null;
@@ -31,7 +26,6 @@ class FormField extends \yii\base\Component {
     public $labelOptions  = ['class'  => 'control-label'];
     public $hintOptions   = ['class'  => 'hint-block'];
     public $parts         = [];
-    public $defaults      = [];
 
 
     public function begin() {
@@ -87,7 +81,6 @@ class FormField extends \yii\base\Component {
     }
 
     public function init() {
-        $this->defaults = ArrayHelper::merge(self::DEFAULTS, $this->form->defaults, $this->defaults);
 
         if (!isset($this->extend['validators'])) {
             $model_validators = $this->model->getActiveValidators($this->attribute);
@@ -117,6 +110,19 @@ class FormField extends \yii\base\Component {
         }
     }
 
+    
+    private function getDefaults($config, $defaults = [], $maps = []) {
+        $result = [];
+
+        foreach ($defaults as $key) {
+            if (isset($this->form->defaults[$key])) {
+                $result[isset($maps[$key]) ? $maps[$key] : $key] = $this->form->defaults[$key];
+            }
+        }
+
+        return array_merge($config, $result);
+    }
+
 
     public function dropDownList($items = [], $options = []) {
         if (empty($options['data-bind'])) {
@@ -133,42 +139,44 @@ class FormField extends \yii\base\Component {
     }
 
     public function textArea($options = []) {
+        $this->extend = ArrayHelper::merge([
+            'textarea' => $this->getDefaults([], ['textarea'], [])
+            ], $options);
         return $this->widget(\x1\knockout\input\Textarea::className(), $options);
-        return $this;
     }
 
 
     public function date($options = []) {
-        $this->extend = ['datetime' => ['time' => false, 'format' => $this->defaults['date']]];
-        if (isset($options['datetime']))
-            $this->extend = ArrayHelper::merge($this->extend, ['datetime' => ArrayHelper::remove($options, 'datetime')]);
-
+        $this->extend = ArrayHelper::merge([
+            'datetime' => $this->getDefaults(['time' => false], ['date'], ['date' => 'format'])
+            ], $options);
         return $this->widget(\x1\knockout\input\Date::className(), $this->options);
     }
 
     public function dateTime($options = []) {
-        $this->extend = ['datetime' => ['time' => true, 'format' => $this->defaults['date']]];
-        if (isset($options['datetime']))
-            $this->extend = ArrayHelper::merge($this->extend, ['datetime' => ArrayHelper::remove($options, 'datetime')]);
-
+        $this->extend = ArrayHelper::merge([
+            'datetime' => $this->getDefaults(['time' => true], ['date'], ['date' => 'format'])
+            ], $options);
         return $this->widget(\x1\knockout\input\DateTime::className(), $this->options);
     }
 
     public function decimal($options = []) {
-        $this->extend = ['decimal' => ['decimals' => 2]];
-        if (isset($options['decimal']))
-            $this->extend = ArrayHelper::merge($this->extend, ['decimal' => ArrayHelper::remove($options, 'decimal')]);
-
+        $this->extend = ArrayHelper::merge([
+            'decimal' => $this->getDefaults([], ['decimals', 'thousandsSeparator', 'decimalSeparator'], [])
+            ], $options);
         return $this->widget(\x1\knockout\input\Decimal::className(), $this->options);
     }
 
     
     public function percent($options = []) {
-        $this->extend = ArrayHelper::merge(['decimal' => ['decimals' => 0, 'percent' => true]], $this->extend, ['decimal' => $options]);
-        return $this->widget(\x1\input\Percent::className(), $options);
+        $this->extend = ArrayHelper::merge([
+            'decimal' => $this->getDefaults(['decimals' => 0, 'percent' => true], ['thousandsSeparator', 'decimalSeparator'], [])
+            ], $options);
+        return $this->widget(\x1\knockout\input\Percent::className(), $options);
     }
 
-    
+
+   
     public function label($label = null, $options = [])
     {
         if ($label === false) {

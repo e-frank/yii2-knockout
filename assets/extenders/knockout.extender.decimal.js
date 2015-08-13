@@ -1,24 +1,3 @@
-{
-	//
-	//	get default decimal- and thousands-separator
-	//  from localstring
-	//
-	var _n_ = ((1234.5).toLocaleString());
-
-    var fn = function(s, s1, s2) {
-    	var a = s.indexOf(s1);
-    	var b = s.indexOf(s2);
-    	if (b > a + 1) {
-    		return s.substring(a + 1, b);
-    	}
-    	return null;
-    }
-
-    ko.extenders.thousandsSeparator = fn(_n_, "1", "2") || '';
-    ko.extenders.decimalSeparator = fn(_n_, "4", "5") || '.';
-}
-
-
 function number_format(number, decimals, dec_point, thousands_sep) {
   //  discuss at: http://phpjs.org/functions/number_format/
   // original by: Jonas Raoni Soares Silva (http://www.jsfromhell.com)
@@ -101,20 +80,13 @@ ko.extenders.decimal = function (target, options) {
 
 	//	default options
 	options	=	$.extend({
-		decimals:           2,
-		decimalSeparator:   ko.extenders.decimalSeparator,
-		thousandsSeparator: ko.extenders.thousandsSeparator,
+		decimals:           x1.config.decimals,
+		decimalSeparator:   x1.config.decimalSeparator,
+		thousandsSeparator: x1.config.thousandsSeparator,
 		nullable:           true,
-		percent: 			false
+		percent:            false
 	}, options);
 	
-	if (options.thousandsSeparator == null) {
-		options.thousandsSeparator = ko.extenders.thousandsSeparator;
-	}
-
-	if (options.decimalSeparator == null) {
-		options.decimalSeparator = ko.extenders.decimalSeparator;
-	}
 
 	target.decimal = ko.computed({
 		owner: this,
@@ -137,7 +109,7 @@ ko.extenders.decimal = function (target, options) {
 			var value;
 			if ($.isNumeric(t)) {
 				t     = options.percent ? t / 100 : t;
-				value = t.toFixed(options.decimals + options.percent ? 2 : 0); 
+				value = t.toFixed(options.decimals + (options.percent ? 2 : 0)); 
 			} else {
 				if (options.nullable)
 					value = '';
@@ -165,49 +137,3 @@ ko.extenders.decimal = function (target, options) {
 	return target;
 }
 
-
-ko.extenders.percent = function (target, options) {
-
-	//	default options
-	options	=	$.extend({
-		decimals:           0,
-		nullable:           true,
-		thousandsSeparator: null,
-		decimalSeparator:   null
-	}, options);
-
-	target.percent = ko.computed({
-		owner: target,
-		read: function() {
-			var t = target();
-			if (t != null && t != undefined && t != '')
-				return number_format(t * 100, options.decimals, options.decimalSeparator, options.thousandsSeparator);
-			else {
-				if (options.nullable)
-					return '';
-				else
-					return 0;
-			}
-		},
-		write: function(v) {
-			v = v.replace(options.thousandsSeparator, '');
-			v = v.replace(options.decimalSeparator, '.');
-			var t = parseFloat(v);
-			if (t != null && t != undefined && t != '')
-				target(v / 100);
-			else {
-				if (options.nullable)
-					target(null);
-				else
-					target(0);
-			}
-		}
-	})
-	
-	target.clear = function() {
-		target(null);
-	}
-	
-	target.display = target.percent;
-	return target;
-}

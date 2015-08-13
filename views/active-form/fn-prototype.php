@@ -67,37 +67,6 @@ function(options) {
     }, self);
 
 
-    // self.errors = ko.pureComputed(function() {
-    //     var errors = [];
-    //     for (var key in data) {
-    //         if (data.hasOwnProperty(key)) {
-    //             if (self[key]) {
-    //                 if (self[key].isObservableArray) {
-    //                     // var a = ko.unwrap(self[key]);
-    //                     // if (a.length == data[key].length) {
-    //                     //     for (i=0; i < a.length; i++) {
-    //                     //         if (a[i].setErrors)
-    //                     //             a[i].setErrors(data[key][i]);
-    //                     //     }
-    //                     // } else {
-    //                     //     throw 500;
-    //                     // }
-    //                 } else {
-    //                     if (self[key].errors) {
-    //                         console.log('err', data[key]);
-    //                         errors.push(data[key])
-    //                         self[key].errors(data[key]);
-    //                     }
-    //                 }
-    //             }
-    //         }
-    //     }
-        
-    //     console.log('myerrors', errors);
-    //     return errors;
-    // }, self);
-
-
     // call init to apply getErrors on arrays
     self.init = function(arrays) {
         for (var x in arrays) {
