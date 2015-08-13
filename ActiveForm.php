@@ -26,6 +26,7 @@ class ActiveForm extends \yii\base\Widget {
     public $structure            = [];
     public $structurePath        = [];
     public $data                 = null;
+    public $options              = null;
     public $encodeErrorSummary   = true;
     public $errorSummaryCssClass = 'error-summary';
     public $defaults             = [

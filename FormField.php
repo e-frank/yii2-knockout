@@ -176,6 +176,17 @@ class FormField extends \yii\base\Component {
     }
 
 
+    public function fileInput($options = []) {
+        return Html::activeFileInput($this->model, $this->attribute, $options);
+    }
+
+    // public function fileDrop($options = []) {
+    //     $this->extend = ArrayHelper::merge([
+    //         'filedrop' => $this->getDefaults(['multiple' => false], [], [])
+    //         ], $options);
+    //     return $this->widget(\x1\knockout\input\FileDrop::className(), $options);
+    // }
+    
    
     public function label($label = null, $options = [])
     {
@@ -213,6 +224,7 @@ class FormField extends \yii\base\Component {
 
         return $this;
     }
+
 
     public function __toString()
     {
