@@ -7,6 +7,6 @@ use yii\helpers\Json;
 
 
 // not used
-<div data-bind='component: <?= Json::encode($) ?>'>
+<div data-bind='component: <?= Json::encode([]) ?>'>
 	this is a dummy text
 </div>

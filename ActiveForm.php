@@ -214,8 +214,8 @@ EOD
 
 
     public function beginRelation($model, $relation) {
-        $this->structurePath[] = ['formName' => $model->formName(), 'relation' => $relation, 'multiple' => $rel->multiple];
         $rel = $model->getRelation($relation);
+        $this->structurePath[] = ['formName' => $model->formName(), 'relation' => $relation, 'multiple' => $rel->multiple];
 
         $path     = [];
 
