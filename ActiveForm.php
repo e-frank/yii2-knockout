@@ -35,6 +35,7 @@ class ActiveForm extends \yii\base\Widget {
         // self::THOUSANDS_SEPARATOR => ',',
         self::DECIMALS            => 2,
     ];
+    public $method = 'post';
 
     public static function begin($config = [])
     {
@@ -45,7 +46,7 @@ class ActiveForm extends \yii\base\Widget {
         $view     = $w->getView();
 
         // echo Html::beginTag('form', ArrayHelper::merge(['action' => Url::current()], ['id' => 123], ArrayHelper::getValue($config, 'options', []), ['id' => $w->id, 'method' => 'POST', 'enctype' => 'multipart/form-data']));
-        echo Html::beginForm($w->action, 'post', ArrayHelper::merge(['id' => 123], ArrayHelper::getValue($config, 'options', []), ['id' => $w->id, 'method' => 'POST', 'enctype' => 'multipart/form-data']));
+        echo Html::beginForm($w->action, $w->method, ArrayHelper::merge(['id' => 123], ArrayHelper::getValue($config, 'options', []), ['id' => $w->id, 'method' => 'POST', 'enctype' => 'multipart/form-data']));
 
         KnockoutAsset::register($view);
         $view->registerJs(sprintf(<<<EOD

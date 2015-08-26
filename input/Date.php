@@ -13,7 +13,7 @@ use yii\helpers\Url;
 class Date extends \yii\widgets\InputWidget {
 	public static $autoIdPrefix = 'x1Date';
 
-	public $size      = null;
+	public $size      = 5;
 	public $maxlength = 10;
 
 	public function run() {
