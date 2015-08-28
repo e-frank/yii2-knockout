@@ -106,7 +106,7 @@ class FormField extends \yii\base\Component {
             $this->inputOptions['data-bind'] = sprintf('value: %1$s.display ? %1$s.display : %1$s', $this->attribute);
         }
         if (empty($this->hiddenOptions['data-bind'])) {
-            $this->hiddenOptions['data-bind'] = sprintf('value: %1$s', $this->attribute);
+            $this->hiddenOptions['data-bind'] = sprintf('hiddenValue: %1$s', $this->attribute);
         }
     }
 

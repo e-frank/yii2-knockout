@@ -65,14 +65,23 @@ ko.extenders.datetime = function (target, options) {
 	target.hours    = options.hours   || ko.extenders.hours;
 
 
+	if (options.time == true) {
+		target.times = [];
+		for (var h = 0; h < target.hours.length;  h++) {
+			for (var m = 0; m < target.minutes.length;  m++) {
+				target.times.push(target.hours[h].value + ':' + target.minutes[m].value)
+			}
+		}
+	}
+
 	//	moment display format
-	var date_db     = ko.extenders.date_db + ((options.time) ? ' HH:mm:ss' : '');
+	var date_db     = ko.extenders.date_db + ((options.time || options.hour || options.minute) ? ' HH:mm:ss' : '');
 	
 
 	// get moment and choose UTC or LOCAL
 	function getMoment(t) {
 		var result = null;
-		if (t && t != null && t != '') {
+		if (t !== undefined && t !== null && t !== '') {
 			var m = ((options.utc == true) ? moment.utc(t, date_db).local() : moment(t, date_db));
 			m.locale(options.language);
 
@@ -141,7 +150,39 @@ ko.extenders.datetime = function (target, options) {
 					}
 				});
 
+
 	if (options.time || options.datetime)
+		target.time	=	ko.computed({
+			owner	:	target,
+			read	:	function() {
+				var m = target.moment();
+				if (m != null)
+					return m.hour() + ':' + m.minute();
+				else
+					return '';
+			},
+			write	:	function(v) {
+				if (v != undefined && v !== null && v !== '') {
+					var m = target.moment();
+					if (m == null)
+					{
+						m = moment();
+						m.seconds(0);
+					}
+					var split = v.split(':');
+					m.hour(split[0]);
+					m.minute(split[1]);
+					//	round to quarters
+					if (options.round) {
+						m.minute(m.minute() - m.minute() % options.timespan);
+					}
+					target(m.format(date_db));
+				} else
+				target(null);
+			}
+		});
+
+		if (options.time || options.hour || options.datetime)
 		target.hour		=	ko.computed({
 			owner	:	target,
 			read	:	function() {
@@ -168,7 +209,7 @@ ko.extenders.datetime = function (target, options) {
 			}
 		});
 
-	if (options.time || options.datetime)
+	if (options.time || options.minute || options.datetime)
 		target.minute	=	ko.computed({
 			owner	:	target,
 			read	:	function() {
@@ -187,15 +228,18 @@ ko.extenders.datetime = function (target, options) {
 						m.seconds(0);
 					}
 					m.minutes(v);
-							//	round to quarters
-							if (options.round) {
-								m.minute( m.minute() - m.minute() % options.timespan);
-							}
-							target(m.format(date_db));
-						} else
-						target(null);
+					//	round to quarters
+					if (options.round) {
+						m.minute( m.minute() - m.minute() % options.timespan);
 					}
-				});
+
+					target(m.format(date_db));
+				} else
+					target(null);
+			}
+		});
+
+
 	
 	target.year	=	ko.computed({
 		owner	:	target,
@@ -247,13 +291,8 @@ ko.extenders.datetime = function (target, options) {
 	
 
 	target.current = function() {
-		target(getMoment(moment().format(date_db)).format(date_db));
-		// var m = moment();
-		// if (options.round && m && m.isValid()) {
-		// 	m.minute(m.minute() - m.minute() % options.timespan);
-		// 	m.second(0);
-		// }
-		// target(m.format(date_db));
+		var m = getMoment(moment().format(date_db));
+		target(m.format(date_db));
 	}
 	
 	target.clear = function() {
