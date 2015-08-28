@@ -20,6 +20,6 @@
         "psr-4": { "x1\\knockout\\": "" }
     },
     "extra": {
-        "bootstrap": "x1\\knockout\\KnockoutBootstrapClass"
+        "bootstrap": "x1\\knockout\\KnockoutBootstrap"
     }
 }
