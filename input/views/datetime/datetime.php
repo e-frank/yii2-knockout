@@ -1,4 +1,3 @@
-<?= var_dump($time) ?>
 <div class="form-inline">
 		<div class="input-group">
 			<span class="input-group-addon"><i class="fa fa-calendar"></i></span>
@@ -12,7 +11,7 @@
 		<select class="form-control" data-bind="options: <?= $attribute ?>.minutes, optionsValue: 'key', optionsText: 'value', optionsCaption: '-', value: <?= $attribute ?>.minute"></select>
 <? } ?>
 
-		<div class="input-group nested-group" style="min-height: 2.45em">
+		<div class="input-group">
 			<span class="input-group-addon" data-bind="click: <?= $attribute ?>.clear">
 				<a href="javascript: false;" class="text-danger" ><i class="fa fa-remove"></i></a>
 			</span>
