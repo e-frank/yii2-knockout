@@ -18,8 +18,9 @@
     },
     "autoload": {
         "psr-4": { "x1\\knockout\\": "" }
-    },
-    "extra": {
-        "bootstrap": "x1\\knockout\\KnockoutBootstrap"
     }
+    // ,
+    // "extra": {
+    //     "bootstrap": "x1\\knockout\\KnockoutBootstrap"
+    // }
 }
