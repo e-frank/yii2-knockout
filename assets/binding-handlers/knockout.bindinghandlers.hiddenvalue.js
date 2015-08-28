@@ -12,11 +12,7 @@ ko.bindingHandlers.hiddenValue	= {
 		else
 			value(current);
 		
-		ko.applyBindingsToNode(element, { value : value });
-
-		// value.subscribe(function () {
-  //           $(element).trigger('change');
-  //       });
+		ko.applyBindingsToNode(element, { 'value' : value });
 	},
 
 }
