@@ -8,7 +8,10 @@ class KnockoutBootstrap implements BootstrapInterface
 {
     public function bootstrap($app)
     {
-    	$app->set('yii\validator\DateValidator', ['format' => 'yyyy-MM-dd HH:mm:ss']);
+    	$app->set('yii\validators\DateValidator', [
+    		'class'  => 'yii\validators\DateValidator',
+    		'format' => 'yyyy-MM-dd HH:mm:ss',
+    		]);
     }
 }
 ?>
