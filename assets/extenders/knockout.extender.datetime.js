@@ -45,6 +45,7 @@ ko.extenders.datetime = function (target, options) {
 		month:    false,
 		day:      false,
 		hour:     false,
+		hours:    ko.extenders.hours,
 		minute:   false,
 		time:     false,
 		round:    true,
@@ -55,7 +56,7 @@ ko.extenders.datetime = function (target, options) {
 	}, options);
 
 
-	if (options.minute && options.minutes == undefined)	 {
+	if ((options.minute || options.time) && options.minutes == undefined)	 {
 		options.minutes = [];
 		for (var i = 0; i < 60; i=i+options.timespan) {
 			options.minutes.push({ key: i, value: i.toString().lpad('0', 2) });
@@ -63,8 +64,9 @@ ko.extenders.datetime = function (target, options) {
 	}
 
 
-	target.minutes  = options.minutes || ko.extenders.minutes;
-	target.hours    = options.hours   || ko.extenders.hours;
+	target.minutes  = options.minutes;
+	target.hours    = options.hours;
+
 
 
 	if (options.time == true) {
