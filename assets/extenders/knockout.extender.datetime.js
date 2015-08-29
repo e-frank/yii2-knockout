@@ -118,7 +118,7 @@ ko.extenders.datetime = function (target, options) {
 		owner	:	target,
 		read	:	function() {
 			var m = target.moment();
-			if (m != null)
+			if (m !== null)
 				return m.format(options.format);
 			else
 				return '';
@@ -162,13 +162,15 @@ ko.extenders.datetime = function (target, options) {
 			owner	:	target,
 			read	:	function() {
 				var m = target.moment();
-				if (m !== null)
-					return m.hours() + ':' + m.minutes();
+				if (m !== null) {
+					return m.hours().toString().lpad('0', 2) + ':' + m.minutes().toString().lpad('0', 2);
+				}
 				else
 					return '';
 			},
 			write	:	function(v) {
-				if (v != undefined && v !== null && v !== '') {
+
+				if (v !== undefined && v !== null && v !== '') {
 					var m = target.moment();
 					if (m == null)
 					{
@@ -176,8 +178,9 @@ ko.extenders.datetime = function (target, options) {
 						m.seconds(0);
 					}
 					var split = v.split(':');
-					m.hours(split[0]);
-					m.minutes(split[1]);
+					m.hour(split[0]);
+					m.minute(split[1]);
+
 					//	round to quarters
 					if (options.round) {
 						m.minute(m.minute() - m.minute() % options.timespan);
@@ -302,7 +305,6 @@ ko.extenders.datetime = function (target, options) {
 	target.current = function() {
 		var m = getMoment(moment().format(date_db));
 		target(m.format(date_db));
-		console.log('current', m.format(date_db), m, target());
 	}
 	
 	target.clear = function() {
