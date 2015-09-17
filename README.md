@@ -75,8 +75,8 @@ var_dump([
 		<?= $form->field($model, 'title') ?>
 		<?#= $form->field($model, 'value')->decimal(['decimal' => ['thousandsSeparator' => ' ']]) ?>
 		<?= $form->field($model, 'value')->decimal() ?>
-		raw data: <code data-bind="text: comp" class="text-right"></code>
-		user's display format: <code data-bind="text: comp.display" class="text-right"></code>
+		computed raw data: <code data-bind="text: comp" class="text-right"></code>
+		computed user's display format: <code data-bind="text: comp.display" class="text-right"></code>
 		<hr />
 		<?= $form->field($model, 'date')->datetime() ?>
 		<code data-bind="text: JSON.stringify(ko.mapping.toJS($data))"></code>
