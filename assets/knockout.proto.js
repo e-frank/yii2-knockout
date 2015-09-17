@@ -87,4 +87,8 @@ function(options) {
             }
         }
     }
+
+    self.isValid = ko.pureComputed(function() {
+        return self.errors().length == 0;
+    }, self);
 }

@@ -42,7 +42,6 @@ class FormField extends \yii\base\Component {
             if (!empty($this->extend))
                 $structure[$this->model->formName()][$this->attribute] = $this->extend;
 
-            // var_dump($structure);
             return Html::beginTag('div', ArrayHelper::merge($this->options, ['data-bind' => sprintf('css: {\'has-error\': (%1$s && %1$s.errors && %1$s.errors() && %1$s.errors().length > 0) }', $this->attribute)]));
     }
 
@@ -96,6 +95,7 @@ class FormField extends \yii\base\Component {
             if (!empty($validators)) {
                 $this->extend['validators'] = new JsExpression(sprintf('function(value, messages) {%s}', implode('', $validators)));
             }
+
         }
 
         $this->parts['{error}'] = sprintf('<!-- ko if: %1$s && %1$s.errors --><div class="help-block"><ul class="list-unstyled" data-bind="foreach: %1$s.errors"><li data-bind="text: $data"></li></ul></div><!-- /ko -->', $this->attribute);
@@ -139,7 +139,7 @@ class FormField extends \yii\base\Component {
     }
 
     public function textArea($options = []) {
-        $this->extend = ArrayHelper::merge([
+        $this->extend = ArrayHelper::merge($this->extend, [
             'textarea' => $this->getDefaults([], ['textarea'], [])
             ], $options);
         return $this->widget(\x1\knockout\input\Textarea::className(), $options);
@@ -147,21 +147,21 @@ class FormField extends \yii\base\Component {
 
 
     public function date($options = []) {
-        $this->extend = ArrayHelper::merge([
+        $this->extend = ArrayHelper::merge($this->extend, [
             'datetime' => $this->getDefaults(['time' => false], ['date'], ['date' => 'format'])
             ], $options);
         return $this->widget(\x1\knockout\input\Date::className(), $this->options);
     }
 
     public function dateTime($options = []) {
-        $this->extend = ArrayHelper::merge([
+        $this->extend = ArrayHelper::merge($this->extend, [
             'datetime' => $this->getDefaults(['time' => true], ['date'], ['date' => 'format'])
             ], $options);
         return $this->widget(\x1\knockout\input\DateTime::className(), $this->options);
     }
 
     public function decimal($options = []) {
-        $this->extend = ArrayHelper::merge([
+        $this->extend = ArrayHelper::merge($this->extend, [
             'decimal' => $this->getDefaults([], ['decimals', 'thousandsSeparator', 'decimalSeparator'], [])
             ], $options);
         return $this->widget(\x1\knockout\input\Decimal::className(), $this->options);
@@ -169,7 +169,7 @@ class FormField extends \yii\base\Component {
 
     
     public function percent($options = []) {
-        $this->extend = ArrayHelper::merge([
+        $this->extend = ArrayHelper::merge($this->extend, [
             'decimal' => $this->getDefaults(['decimals' => 0, 'percent' => true], ['thousandsSeparator', 'decimalSeparator'], [])
             ], $options);
         return $this->widget(\x1\knockout\input\Percent::className(), $options);

@@ -26,6 +26,7 @@ class ActiveForm extends \yii\base\Widget {
     public $structure            = [];
     public $structurePath        = [];
     public $data                 = null;
+    public $errors               = null;
     public $options              = null;
     public $encodeErrorSummary   = true;
     public $errorSummaryCssClass = 'error-summary';
@@ -33,26 +34,48 @@ class ActiveForm extends \yii\base\Widget {
         // self::DATE                => 'YYYY-MM-DD',
         // self::DECIMAL_SEPARATOR   => '.',
         // self::THOUSANDS_SEPARATOR => ',',
-        self::DECIMALS            => 2,
+        // self::DECIMALS            => 2,
     ];
-    public $method = 'post';
+    public $method           = 'POST';
+    public $viewModelName    = 'viewModel';
+    public $validateOnSubmit = true;
 
     public static function begin($config = [])
     {
         $defaults    = ArrayHelper::remove($config, 'defaults', []);
         $w           = parent::begin($config);
-        var_dump($w->defaults);
         $w->defaults = ArrayHelper::merge($w->defaults, $defaults);
 
         $view     = $w->getView();
 
-        echo Html::beginForm($w->action, $w->method, ArrayHelper::merge(['id' => 123], ArrayHelper::getValue($config, 'options', []), ['id' => $w->id, 'method' => 'POST', 'enctype' => 'multipart/form-data']));
+        echo Html::beginForm($w->action, $w->method, ArrayHelper::merge(ArrayHelper::getValue($config, 'options', []), ['id' => $w->id, 'method' => 'POST', 'enctype' => 'multipart/form-data']));
 
         KnockoutAsset::register($view);
-        $view->registerJs(sprintf(<<<EOD
-var %1\$s = $.extend({}, x1.config, %2\$s);
+
+        // client side validate on submit
+        if ($w->validateOnSubmit) {
+            $view->registerJs(sprintf(<<<EOD
+$('#%1\$s').submit(function(e) {
+    var vm = ko.dataFor(e.target);
+    if (vm && vm.validate) {
+        vm.validate();
+    }
+
+    if (vm && vm.isValid && vm.isValid()) {
+        return true;
+    } else {
+        e.preventDefault();
+        return false;
+    }
+})
 EOD
-, lcfirst(\yii\helpers\Inflector::camelize($w->id)), Json::encode($w->defaults)));
+, $w->id, Json::encode($w->defaults)), View::POS_END);
+        }
+
+//         $view->registerJs(sprintf(<<<EOD
+// var %1\$s = $.extend({}, x1.config, %2\$s);
+// EOD
+// , lcfirst(\yii\helpers\Inflector::camelize($w->id)), Json::encode($w->defaults)));
         return $w;
     }
 
@@ -69,7 +92,7 @@ EOD
         $w->createMappings();
 
         if (!empty($w->data))
-            $w->bind($w->data);
+            $w->bind($w->data, $w->errors);
 
         parent::end();
     }
@@ -122,13 +145,13 @@ EOD
 
         $mapping['create'] = new JsExpression(sprintf('function(options) {
             var self = new %1$s.prototype(options);
-            %2$s
+            %3$s
             if (self.init) { self.init(%1$s._arrays); }
-            if (%1$s._fn) {
-                self = %1$s._fn(self);
+            if (%1$s.%2$s) {
+                self = %1$s.%2$s(self);
             }
             return self;
-        }', $this->namespace, implode('', $models)));
+        }', $this->namespace, $this->viewModelName, implode('', $models)));
         $mapping['_defaults'] = new JsExpression(Json::encode($this->defaults));
 
         $this->walkLevel($this->structure, [], $mapping);
@@ -165,13 +188,13 @@ EOD
                     $m['_arrays'] = new JsExpression(Json::encode($arrays));
                     $m[$relation]['create']  = new JsExpression(sprintf('function(options) { 
                         var self = new %1$s.prototype(options);
-                        ko.mapping.fromJS(options.data, %1$s.%2$s, self);
-                        if (self.init) { self.init(%1$s.%5$s._arrays); }
-                        if (%1$s.%3$s._fn) {
-                            self = %1$s.%3$s._fn(self);
+                        ko.mapping.fromJS(options.data, %1$s.%3$s, self);
+                        if (self.init) { self.init(%1$s.%6$s._arrays); }
+                        if (%1$s.%4$s.%2$s) {
+                            self = %1$s.%4$s.%2$s(self);
                         }
                         return self;
-                    }', $this->namespace, implode('.', $p), implode('.', $path), Json::encode($subrelations), implode('.', array_slice($path, 0, count($path) - 1))));
+                    }', $this->namespace, $this->viewModelName, implode('.', $p), implode('.', $path), Json::encode($subrelations), implode('.', array_slice($path, 0, count($path) - 1))));
 
                     $this->walkLevel($level, $path, $m[$relation]);
                     array_pop($path);
@@ -182,10 +205,15 @@ EOD
         }
     }
 
-    public function bind($data = null) {
+    public function bind($data = null, $errors = null) {
         $this->view->registerJs(sprintf('
-            ko.applyBindings(vm = ko.mapping.fromJS(%1$s, %2$s), document.getElementById("%3$s"));
-        ', Json::encode($data), $this->namespace, $this->id), View::POS_READY);
+            (function(ko, data, namespace, element, errors) {
+                ko.applyBindings(vm = ko.mapping.fromJS(data, namespace), document.getElementById(element));
+                if (errors !== null) {
+                    vm.setErrors(errors);
+                }
+            })(ko, %1$s, %2$s, "%3$s", %4$s)
+        ', Json::encode($data), $this->namespace, $this->id, Json::encode($errors)), View::POS_READY);
     }
 
 
