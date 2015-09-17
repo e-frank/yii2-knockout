@@ -117,3 +117,6 @@ mapping.viewModel = function(self) {
 ```
 
 
+the demo page should look like this:
+
+![Screen1](screen1.png)
