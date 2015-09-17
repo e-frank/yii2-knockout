@@ -1,9 +1,9 @@
 Knockout Viewmodel Generator for Yii2
 =====================================
-This extension provides a replacement for ActiveForm.
-A KnockoutJS viewmodel is automatically generated (using knockout mapping lib),
+This extension provides a replacement for **ActiveForm**.
+A **KnockoutJS viewmodel** is automatically generated (using knockout mapping lib),
 which serves a starting point for your customization, e.g. computed observables.
-Moreover you get some more input types, like "decimal", "percent", "date" and "datetime",
+Moreover you get some more input types, like "**decimal**", "**percent**", "**date**" and "**datetime**",
 which display the raw data in the user's locale format and store the data in ISO-format.
 
 
@@ -30,13 +30,12 @@ to the require section of your `composer.json` file.
 
 Usage
 -----
+example code for a view.
+note that you would place model load and validation code in your controller/action.
 
 
 ```php
 <?php
-use yii\helpers\Html;
-use yii\helpers\Json;
-use yii\web\JsExpression;
 use x1\knockout\ActiveForm;
 
 
@@ -76,8 +75,9 @@ var_dump([
 		<?= $form->field($model, 'title') ?>
 		<?#= $form->field($model, 'value')->decimal(['decimal' => ['thousandsSeparator' => ' ']]) ?>
 		<?= $form->field($model, 'value')->decimal() ?>
-		<code data-bind="text: comp" class="text-right"></code>
-		<code data-bind="text: comp.display" class="text-right"></code>
+		raw data: <code data-bind="text: comp" class="text-right"></code>
+		user's display format: <code data-bind="text: comp.display" class="text-right"></code>
+		<hr />
 		<?= $form->field($model, 'date')->datetime() ?>
 		<code data-bind="text: JSON.stringify(ko.mapping.toJS($data))"></code>
 
@@ -97,9 +97,11 @@ var_dump([
 	</div>
 </div>
 <? ActiveForm::end() ?>
+```
 
 
-<? $this->beginBlock('script') ?>
+custom viewModel enhancements, located at the end of your view, after all other scripts are loaded:
+```php
 <script>
 mapping.viewModel = function(self) {
 	console.log(self, x1);
@@ -111,4 +113,6 @@ mapping.viewModel = function(self) {
     return self;
 }
 </script>
-<? $this->endBlock('script') ?>```
+```
+
+
