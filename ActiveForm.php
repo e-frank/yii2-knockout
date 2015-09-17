@@ -41,18 +41,16 @@ class ActiveForm extends \yii\base\Widget {
     {
         $defaults    = ArrayHelper::remove($config, 'defaults', []);
         $w           = parent::begin($config);
+        var_dump($w->defaults);
         $w->defaults = ArrayHelper::merge($w->defaults, $defaults);
 
         $view     = $w->getView();
 
-        // echo Html::beginTag('form', ArrayHelper::merge(['action' => Url::current()], ['id' => 123], ArrayHelper::getValue($config, 'options', []), ['id' => $w->id, 'method' => 'POST', 'enctype' => 'multipart/form-data']));
         echo Html::beginForm($w->action, $w->method, ArrayHelper::merge(['id' => 123], ArrayHelper::getValue($config, 'options', []), ['id' => $w->id, 'method' => 'POST', 'enctype' => 'multipart/form-data']));
 
         KnockoutAsset::register($view);
         $view->registerJs(sprintf(<<<EOD
 var %1\$s = $.extend({}, x1.config, %2\$s);
-
-console.log(%1\$s)
 EOD
 , lcfirst(\yii\helpers\Inflector::camelize($w->id)), Json::encode($w->defaults)));
         return $w;
@@ -105,8 +103,6 @@ EOD
 
     public function init() {
         parent::init();
-        // if (!empty($this->deleteContent) && empty($this->deleteButton))
-        //     throw new \yii\base\InvalidConfigException("Expecting 'deleteButton' property of " . get_class($this));
 
     	if ($this->action == null)
     		$this->action = Url::current();
@@ -114,16 +110,14 @@ EOD
 
 
     public function createMappings() {
-// .extend({arrayError: true})
-
         $mapping              = [];
-        $mapping['prototype'] = new JsExpression($this->render('active-form/fn-prototype'));
+        // $mapping['prototype'] = new JsExpression($this->render('active-form/fn-prototype'));
+        $mapping['prototype'] = new JsExpression('ko.proto');
 
-        // make create function for 1st level vs prototype
+        // generate create function for 1st level vs prototype
         $models = [];
         foreach ($this->structure as $key => $value) {
             $models[] = sprintf('ko.mapping.fromJS(options.data, %s.%s, self);', $this->namespace, strtolower($key));
-            // $models[] = sprintf('if (self.init) { self.init(%s.%s._arrays); };', $this->namespace, strtolower($key));            
         }
 
         $mapping['create'] = new JsExpression(sprintf('function(options) {
@@ -138,15 +132,6 @@ EOD
         $mapping['_defaults'] = new JsExpression(Json::encode($this->defaults));
 
         $this->walkLevel($this->structure, [], $mapping);
-    
-//         $require = <<<EOD
-// define('%s', ['ko', 'prototype'], function(ko, proto) {
-//     var viewmodel       = %s;
-//     viewmodel.prototype = proto;
-//     return viewmodel;
-// })
-// EOD;
-//         $this->view->registerJs(sprintf($require, $this->namespace, Json::encode($mapping)), View::POS_END);        
 
         $this->view->registerJs(sprintf('var %s=%s;', $this->namespace, Json::encode($mapping)), View::POS_END);
     }
@@ -198,18 +183,8 @@ EOD
     }
 
     public function bind($data = null) {
-        $this->view->registerJs('console.log("mapping", mapping);', View::POS_READY);
-        // $this->view->registerJs(sprintf('require(["ko"], function(ko) { ko.applyBindings(vm = ko.mapping.fromJS(%1$s, %2$s), document.getElementById("%3$s"));
-        //     // vm.setErrors({title: ["asd"], test2s:{0: ["xxx"]}}); // Form.php // sam was here xxx
-        // })', Json::encode($data), $this->namespace, $this->id), View::POS_READY);
-
         $this->view->registerJs(sprintf('
             ko.applyBindings(vm = ko.mapping.fromJS(%1$s, %2$s), document.getElementById("%3$s"));
-            // require(["ko"], function(ko) {
-            //     ko.applyBindings(vm = ko.mapping.fromJS(%1$s, %2$s), document.getElementById("%3$s"));
-            // });
-            // vm.setErrors({title: ["asd"], test2s:{0: ["xxx"]}}); // Form.php // sam was here xxx
-            // console.log("viewmodel", vm);
         ', Json::encode($data), $this->namespace, $this->id), View::POS_READY);
     }
 

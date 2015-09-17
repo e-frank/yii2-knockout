@@ -1,3 +1,4 @@
+ko.proto =
 function(options) {
     // console.log('prototype', options);
     options        = options || {};
@@ -76,4 +77,14 @@ function(options) {
         }
     }
 
+
+    self.validate = function() {
+        for (var key in self) {
+            if (self.hasOwnProperty(key)) {
+                if (self[key].validate) {
+                    self[key].validate();
+                }
+            }
+        }
+    }
 }
