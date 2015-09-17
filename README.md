@@ -38,10 +38,9 @@ note that you would place model load and validation code in your controller/acti
 <?php
 use x1\knockout\ActiveForm;
 
-
 $this->title  = 'Programmatic Viewmodel Generation';
-
 	
+// init data from default or post
 $post = Yii::$app->request->post();
 $data = empty($post) ? [
 	'title' => '', 
@@ -49,6 +48,7 @@ $data = empty($post) ? [
 	'date'  => sprintf('%s%d:00', date('Y-m-d H:'), date('i') - (date('i') % 15))
 	] : $post['DynamicModel'] ;
 
+// create a dynamic model, for demonstration purpose
 $model = new yii\base\DynamicModel($data);
 $model->addRule(['title'], 'string', ['max' => 128]);
 $model->addRule(['title'], 'required');
@@ -68,7 +68,7 @@ var_dump([
 
 ?>
 
-<? $form = ActiveForm::begin(['data' => $model->toArray(), 'errors' => $model->getErrors(), 'defaults' => ['decimals' => 3]]) ?>
+<? $form = ActiveForm::begin(['errors' => $model->getErrors(), 'defaults' => ['decimals' => 3]]); ?>
 <div class="panel panel-default">
     <div class="panel-heading"><?= $this->title ?></div>
     <div class="panel-body">
@@ -110,6 +110,7 @@ mapping.viewModel = function(self) {
     	return self.value() * 1.2;
     }).extend({"decimal":null});
 
+    // must return self
     return self;
 }
 </script>

@@ -91,6 +91,15 @@ EOD
         echo Html::endForm();
         $w->createMappings();
 
+        // if we don't have any data, initialize empty attributes, otherwise attributes are not created by mapping
+        if (empty($w->data)) {
+            foreach ($w->structure as $key => $value) {
+                foreach ($value as $key2 => $value2) {
+                    $w->data[$key2] = null;
+                }
+            }
+        }
+
         if (!empty($w->data))
             $w->bind($w->data, $w->errors);
 
