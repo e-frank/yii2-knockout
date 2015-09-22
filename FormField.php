@@ -149,7 +149,7 @@ class FormField extends \yii\base\Component {
         $this->extend = ArrayHelper::merge($this->extend, [
             'textarea' => $this->getDefaults([], ['textarea'], [])
             ], $options);
-        return $this->widget(\x1\knockout\input\Textarea::className(), $this->options);
+        return $this->widget(\x1\knockout\input\Textarea::className(), $options);
     }
 
 
