@@ -167,6 +167,12 @@ class FormField extends \yii\base\Component {
         return $this->widget(\x1\knockout\input\Decimal::className(), $this->options);
     }
 
+    public function integer($options = []) {
+        $this->extend = ArrayHelper::merge($this->extend, [
+            'decimal' => $this->getDefaults(['decimals' => 0], ['decimals', 'thousandsSeparator', 'decimalSeparator'], [])
+            ], $options);
+        return $this->widget(\x1\knockout\input\Decimal::className(), $this->options);
+    }
     
     public function percent($options = []) {
         $this->extend = ArrayHelper::merge($this->extend, [
