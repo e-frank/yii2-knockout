@@ -149,7 +149,7 @@ class FormField extends \yii\base\Component {
         $this->extend = ArrayHelper::merge($this->extend, [
             'textarea' => $this->getDefaults([], ['textarea'], [])
             ], $options);
-        return $this->widget(\x1\knockout\input\Textarea::className(), $options);
+        return $this->widget(\x1\knockout\input\Textarea::className(), $this->options);
     }
 
 
@@ -176,7 +176,7 @@ class FormField extends \yii\base\Component {
 
     public function integer($options = []) {
         $this->extend = ArrayHelper::merge($this->extend, [
-            'decimal' => $this->getDefaults(['decimals' => 0], ['decimals', 'thousandsSeparator', 'decimalSeparator'], [])
+            'decimal' => $this->getDefaults(['decimals' => 0], ['thousandsSeparator', 'decimalSeparator'], [])
             ], $options);
         return $this->widget(\x1\knockout\input\Decimal::className(), $this->options);
     }
@@ -185,12 +185,12 @@ class FormField extends \yii\base\Component {
         $this->extend = ArrayHelper::merge($this->extend, [
             'decimal' => $this->getDefaults(['decimals' => 0, 'percent' => true], ['thousandsSeparator', 'decimalSeparator'], [])
             ], $options);
-        return $this->widget(\x1\knockout\input\Percent::className(), $options);
+        return $this->widget(\x1\knockout\input\Percent::className(), $this->options);
     }
 
 
     public function fileInput($options = []) {
-        return Html::activeFileInput($this->model, $this->attribute, $options);
+        return Html::activeFileInput($this->model, $this->attribute, $this->options);
     }
 
     // public function fileDrop($options = []) {
