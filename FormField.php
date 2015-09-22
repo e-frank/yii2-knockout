@@ -138,6 +138,13 @@ class FormField extends \yii\base\Component {
         return $this;
     }
 
+    public function passwordInput($options = []) {
+        $this->inputOptions['type']   = 'password';
+        $this->hiddenOptions['type']  = 'password';
+        $this->hiddenOptions['style'] = 'visibility: hidden; display: none';
+        return $this;
+    }
+
     public function textArea($options = []) {
         $this->extend = ArrayHelper::merge($this->extend, [
             'textarea' => $this->getDefaults([], ['textarea'], [])
