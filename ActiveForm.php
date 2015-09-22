@@ -219,7 +219,7 @@ EOD
     public function bind($data = null, $errors = null) {
         $this->view->registerJs(sprintf('
             (function(ko, data, namespace, element, errors) {
-                if (element !== undefined && element !== null && element !== '') {
+                if (element !== undefined && element !== null && element !== \'\') {
                     ko.applyBindings(vm = ko.mapping.fromJS(data, namespace), document.getElementById(element));
                 } else {
                     ko.applyBindings(vm = ko.mapping.fromJS(data, namespace));
