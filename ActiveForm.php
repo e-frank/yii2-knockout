@@ -25,6 +25,7 @@ class ActiveForm extends \yii\base\Widget {
     public $namespace            = 'mapping';
     public $structure            = [];
     public $structurePath        = [];
+    public $element              = null;
     public $data                 = null;
     public $errors               = null;
     public $options              = null;
@@ -100,8 +101,9 @@ EOD
             }
         }
 
-        if (!empty($w->data))
+        if (!empty($w->data)) {
             $w->bind($w->data, $w->errors);
+        }
 
         parent::end();
     }
@@ -217,12 +219,16 @@ EOD
     public function bind($data = null, $errors = null) {
         $this->view->registerJs(sprintf('
             (function(ko, data, namespace, element, errors) {
-                ko.applyBindings(vm = ko.mapping.fromJS(data, namespace), document.getElementById(element));
+                if (element !== undefined && element !== null && element !== '') {
+                    ko.applyBindings(vm = ko.mapping.fromJS(data, namespace), document.getElementById(element));
+                } else {
+                    ko.applyBindings(vm = ko.mapping.fromJS(data, namespace));
+                }
                 if (errors !== null) {
                     vm.setErrors(errors);
                 }
             })(ko, %1$s, %2$s, "%3$s", %4$s)
-        ', Json::encode($data), $this->namespace, $this->id, Json::encode($errors)), View::POS_READY);
+        ', Json::encode($data), $this->namespace, ($this->element == null) ? $this->id : $this->element, Json::encode($errors)), View::POS_READY);
     }
 
 
