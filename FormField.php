@@ -190,7 +190,7 @@ class FormField extends \yii\base\Component {
 
 
     public function fileInput($options = []) {
-        return Html::activeFileInput($this->model, $this->attribute, $this->options);
+        return Html::activeFileInput($this->model, $this->attribute, $options);
     }
 
     // public function fileDrop($options = []) {
