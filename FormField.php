@@ -145,6 +145,11 @@ class FormField extends \yii\base\Component {
         return $this;
     }
 
+    public function hiddenInput($options = []) {
+        $this->template = "{hidden}";
+        return $this;
+    }
+
     public function textArea($options = []) {
         $this->extend = ArrayHelper::merge($this->extend, [
             'textarea' => $this->getDefaults([], ['textarea'], [])
