@@ -28,26 +28,47 @@ class FormField extends \yii\base\Component {
     public $parts         = [];
 
 
+    private function getPath() {
+
+    }
+
     public function begin() {
-            $path     = [];
-
-            foreach ($this->form->structurePath as $key => $value) {
-                $path[] = $value['formName'];
-                $path[] = '_relations';
-                $path[] = $value['relation'];
-            }
-
-            $structure =& $this->form->arrayPath($this->form->structure, $path);
-
-            if (!empty($this->extend))
-                $structure[$this->model->formName()][$this->attribute] = $this->extend;
-
             return Html::beginTag('div', ArrayHelper::merge($this->options, ['data-bind' => sprintf('css: {\'has-error\': (%1$s && %1$s.errors && %1$s.errors() && %1$s.errors().length > 0) }', $this->attribute)]));
     }
 
     public function end() {
         // return 'FormField END';
             return Html::endTag('div');
+    }
+
+
+    public function extend($extend) {
+        $this->extend($extend);
+    }
+
+    public function item() {
+        $path     = [];
+
+        if (count($this->form->structurePath) > 0) {
+            $path[] = '[' . $this->attribute . ']';
+            $parent = '';
+            foreach (array_reverse($this->form->structurePath) as $value) {
+                if (ArrayHelper::getValue($value, 'multiple', false) == true) {
+                    $path[] = '[\'+'.$parent.'$index()+\']';
+                    // $path[] = '[]';
+                }
+                $path[] = '[' . $value['relation'] . ']';
+                $path[] = $value['formName'];
+                $parent .= '$parentContext.';
+            }
+        } else {
+            $path[] = $this->attribute;
+        }
+
+        $hidden = implode('',  array_reverse($path));
+
+        $this->parts['{hidden}'] = sprintf('<input type="hidden" data-bind="value: %s, attr:{name:\'%s\'}" />', $this->attribute, $hidden);
+        return $this;
     }
 
     public function render($content = null)
@@ -76,10 +97,20 @@ class FormField extends \yii\base\Component {
             $content = call_user_func($content, $this);
         }
 
-        return $this->begin() . "\n" . $content . "\n" . $this->end();
+        return empty($content) ? '' : $this->begin() . "\n" . $content . "\n" . $this->end();
     }
 
     public function init() {
+
+        if (preg_match('|^\[([^\]]*)\](.*)|is', $this->attribute, $matches)) {
+            $this->attribute = array_pop($matches);
+            // $this->prefix    = '$data.';
+            // var_dump($this->inputOptions);
+            // $this->hiddenOptions['name'] = '';
+        }
+
+        
+
 
         if (!isset($this->extend['validators'])) {
             $model_validators = $this->model->getActiveValidators($this->attribute);
@@ -244,8 +275,36 @@ class FormField extends \yii\base\Component {
     }
 
 
+    private function addField() {
+        $path     = [];
+
+        foreach ($this->form->structurePath as $key => $value) {
+            $path[] = $value['formName'];
+            $path[] = '_relations';
+            $path[] = $value['relation'];
+        }
+        $structure =& $this->form->arrayPath($this->form->structure, $path);
+
+        if (!empty($this->extend))
+            $structure[$this->model->formName()][$this->attribute] = $this->extend;
+    }
+
+    public function create() {
+        $this->addField();
+
+        try {
+            return $this->render('');
+        } catch (\Exception $e) {
+            \yii\base\ErrorHandler::convertExceptionToError($e);
+            return '';
+        }
+    }
+
+
     public function __toString()
     {
+        $this->addField();
+
         // __toString cannot throw exception
         // use trigger_error to bypass this limitation
         try {

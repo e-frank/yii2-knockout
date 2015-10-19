@@ -41,6 +41,8 @@ class ActiveForm extends \yii\base\Widget {
     public $viewModelName    = 'viewModel';
     public $validateOnSubmit = true;
 
+    private $relationTag     = [];
+
     public static function begin($config = [])
     {
         $defaults    = ArrayHelper::remove($config, 'defaults', []);
@@ -189,7 +191,6 @@ EOD
                 foreach ($relations as $relation => &$level) {
                     $path[]                  = $relation;
 
-
                     $p            = $path;
                     $firstModel   = key(reset($relations));
                     $p[]          = strtolower($firstModel);
@@ -232,10 +233,13 @@ EOD
     }
 
 
-    public function beginRelation($model, $relation) {
+    public function beginRelation($model, $relation, $tag = null, $options = []) {
         $rel = $model->getRelation($relation);
         $this->structurePath[] = ['formName' => $model->formName(), 'relation' => $relation, 'multiple' => $rel->multiple];
 
+        if ($tag === null) {
+            $tag = $rel->multiple ? $tag = 'tbody' : 'div';
+        }
         $path     = [];
 
         foreach ($this->structurePath as $key => $value) {
@@ -254,12 +258,22 @@ EOD
             $structure[] = $relation;
         }
 
+        $options['data-bind'] = sprintf('%s: %s', ($rel->multiple) ? 'foreach' : 'with', $relation);
+        $this->relationTag[]  = $tag;
+        if ($tag !== false)
+            return Html::beginTag($tag, $options);
+        else
+            return null;
         return Html::beginTag('div', ['data-bind' => sprintf('%s: %s', ($rel->multiple) ? 'foreach' : 'with', $relation)]);
     }
 
     public function endRelation() {
         array_pop($this->structurePath);
-        return Html::endTag('div');
+        $tag = array_pop($this->relationTag);
+        if ($tag !== false)
+            return Html::endTag($tag);
+        else
+            return null;
     }
 
 
