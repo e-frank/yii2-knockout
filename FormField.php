@@ -176,6 +176,12 @@ class FormField extends \yii\base\Component {
         return $this;
     }
 
+
+    public function noHidden() {
+        $this->parts['{hidden}'] = '';
+        return $this;
+    }
+
     public function hiddenInput($options = []) {
         $this->template = "{hidden}";
         return $this;
