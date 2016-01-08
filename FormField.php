@@ -154,6 +154,10 @@ class FormField extends \yii\base\Component {
         return array_merge($config, $result);
     }
 
+    public function tab($index) {
+        $this->inputOptions['tabindex'] = $index;
+        return $this;
+    }
 
     public function dropDownList($items = [], $options = []) {
         if (empty($options['data-bind'])) {

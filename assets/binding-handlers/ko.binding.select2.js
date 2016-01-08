@@ -16,6 +16,12 @@ ko.bindingHandlers.select2 = {
 			}, v);
 
 
+		this.attachEvents = function() {
+			if (bindings.open && bindings.open == 1) {
+				e.select2('open');
+			}
+		}
+
 		this.getData = function() {
 			var s2   = e.data('select2');
 			var data = s2.data();
@@ -53,16 +59,21 @@ ko.bindingHandlers.select2 = {
 		// rebuild data on changed items
 		if (items !== null) {
 			items.subscribe(function(items) {
-				e.select2('destroy');
+				var isOpen = e.data('select2').isOpen()
+				// e.select2('destroy');
 				e.empty();
+
 				options.data = ko.unwrap(items || []);
 				e.select2(options);
 				setCurrent();
+				if (isOpen)
+					e.select2('open');
 			});
 		}
 
 		e.select2(options);
 		setCurrent();
+		attachEvents();
 
 
 		// listen to changed event
@@ -84,13 +95,13 @@ ko.bindingHandlers.select2 = {
 			e.on('change', changed)
 		}
 
-
 		// if selected value has changed, update select2
 		if (selectedX && ko.isObservable(selectedX)) {
 			selectedX.subscribe(function(newvalue) {
 				setCurrent();
 			});
 		}
+
 
 	}
 
