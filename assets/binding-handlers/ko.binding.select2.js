@@ -17,7 +17,7 @@ ko.bindingHandlers.select2 = {
 
 
 		this.attachEvents = function() {
-			if (bindings.open && bindings.open == 1) {
+			if (bindings.open && bindings.open == true) {
 				e.select2('open');
 			}
 		}
