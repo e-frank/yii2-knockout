@@ -31,6 +31,7 @@ class KnockoutAsset extends \yii\web\AssetBundle
 		'extenders/knockout.extender.validators.js'                => 'extenders/knockout.extender.validators.min.js',
 		'extenders/knockout.extender.datetime.js'                  => 'extenders/knockout.extender.datetime.min.js',
 		'extenders/knockout.extender.decimal.js'                   => 'extenders/knockout.extender.decimal.min.js',
+		'extenders/knockout.extender.bool.js'                      => 'extenders/knockout.extender.bool.min.js',
 
 		'extenders/knockout.extender.subscribe.js'                 => 'extenders/knockout.extender.subscribe.min.js',
 		'extenders/knockout.extender.array-error.js'               => 'extenders/knockout.extender.array-error.min.js',

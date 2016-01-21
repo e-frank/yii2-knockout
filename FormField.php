@@ -169,6 +169,28 @@ class FormField extends \yii\base\Component {
         return $this;
     }
 
+
+    /**
+     * draws a checkbox. set trueValue (default 1) and falseValue (default 0) in options
+     * @param  array  $options [description]
+     * @return [type]          [description]
+     */
+    public function checkbox($options = []) {
+        $this->extend = ArrayHelper::merge($this->extend, [
+            'bool' => $this->getDefaults(['trueValue' => 1, 'falseValue' => 0], [], [])
+            ], $options);
+
+        if (empty($options['data-bind'])) {
+            $options['data-bind'] = sprintf('checked: %1$s.bool', $this->attribute);
+        }
+
+        $this->options['class'] = 'checkbox';
+        $this->template         = "<label>{input}\n{hidden}\n{label}\n{hint}\n{error}";
+        $this->parts['{label}'] = $this->model->getAttributeLabel($this->attribute);
+        $this->inputOptions     = ['id' => null, 'type' => 'checkbox', 'data-bind' => sprintf('checked: %1$s.bool', $this->attribute), 'value' => $this->extend['bool']['trueValue']];
+        return $this;
+    }
+
     public function textInput($options = []) {
         return $this;
     }
