@@ -12,6 +12,8 @@ use yii\helpers\Url;
 
 class FormField extends \yii\base\Component {
 
+    const TEMPLATE = "{label}\n{input}\n{hidden}\n{hint}\n{error}";
+
     public static $autoIdPrefix = 'knockoutFormField';
 
     public $model         = null;
@@ -19,7 +21,7 @@ class FormField extends \yii\base\Component {
     public $form          = null;
     public $extend        = [];
     public $options       = ['class' => 'form-group'];
-    public $template      = "{label}\n{input}\n{hidden}\n{hint}\n{error}";
+    public $template      = self::TEMPLATE;
     public $inputOptions  = ['class'  => 'form-control', 'name' => null];
     public $hiddenOptions = [];
     public $errorOptions  = ['class'  => 'help-block'];
@@ -185,9 +187,10 @@ class FormField extends \yii\base\Component {
         }
 
         $this->options['class'] = 'checkbox';
-        $this->template         = "<label>{input}\n{hidden}\n{label}\n{hint}\n{error}";
+        if ($this->template == self::TEMPLATE)
+            $this->template = "<label>{input}\n{hidden}\n{label}</label>\n{hint}\n{error}";
         $this->parts['{label}'] = $this->model->getAttributeLabel($this->attribute);
-        $this->inputOptions     = ['id' => null, 'type' => 'checkbox', 'data-bind' => sprintf('checked: %1$s.bool', $this->attribute), 'value' => $this->extend['bool']['trueValue']];
+        $this->inputOptions     = ArrayHelper::merge($this->inputOptions, ['id' => null, 'type' => 'checkbox', 'data-bind' => sprintf('checked: %1$s.bool', $this->attribute), 'value' => $this->extend['bool']['trueValue']]);
         return $this;
     }
 
