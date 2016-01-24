@@ -194,13 +194,12 @@ EOD
                     $p            = $path;
                     $firstModel   = key(reset($relations));
                     $p[]          = strtolower($firstModel);
-
                     $subrelations = isset($level[$firstModel]['_relations']) ? array_keys($level[$firstModel]['_relations']) : [];
 
                     $m['_arrays'] = new JsExpression(Json::encode($arrays));
                     $m[$relation]['create']  = new JsExpression(sprintf('function(options) { 
                         var self = new %1$s.prototype(options);
-                        ko.mapping.fromJS(options.data, %1$s.%3$s, self);
+                        var x = ko.mapping.fromJS(options.data, %1$s.%3$s, self);
                         if (self.init) { self.init(%1$s.%6$s._arrays); }
                         if (%1$s.%4$s.%2$s) {
                             self = %1$s.%4$s.%2$s(self);

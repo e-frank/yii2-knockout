@@ -29,18 +29,20 @@ class FormField extends \yii\base\Component {
     public $hintOptions   = ['class'  => 'hint-block'];
     public $parts         = [];
 
+    private $prefix = null;
 
     private function getPath() {
 
     }
 
     public function begin() {
-            return Html::beginTag('div', ArrayHelper::merge($this->options, ['data-bind' => sprintf('css: {\'has-error\': (%1$s && %1$s.errors && %1$s.errors() && %1$s.errors().length > 0) }', $this->attribute)]));
+        $dataBind = sprintf('css: {\'has-error\': (%1$s && %1$s.errors && %1$s.errors() && %1$s.errors().length > 0) }', $this->attribute, ArrayHelper::getValue($this->options, 'data-bind', ''));
+        return (($this->prefix == null) ? '' : Html::beginTag('div', ['data-bind' => 'with: ' . strtolower($this->prefix)])) . Html::beginTag('div', ArrayHelper::merge($this->options, ['data-bind' => $dataBind]));
     }
 
     public function end() {
         // return 'FormField END';
-            return Html::endTag('div');
+            return (($this->prefix == null) ? '' : Html::endTag('div')) . Html::endTag('div');
     }
 
 
@@ -49,7 +51,7 @@ class FormField extends \yii\base\Component {
     }
 
     public function item() {
-        $path     = [];
+        $path  = [];
 
         if (count($this->form->structurePath) > 0) {
             $path[] = '[' . $this->attribute . ']';
@@ -57,12 +59,15 @@ class FormField extends \yii\base\Component {
             foreach (array_reverse($this->form->structurePath) as $value) {
                 if (ArrayHelper::getValue($value, 'multiple', false) == true) {
                     $path[] = '[\'+'.$parent.'$index()+\']';
-                    // $path[] = '[]';
                 }
                 $path[] = '[' . $value['relation'] . ']';
                 $path[] = $value['formName'];
                 $parent .= '$parentContext.';
             }
+
+
+            // $this->prefix = $this->model->formName();
+#            $this->template = sprintf('<div data-bind="with: %s">%s</div>', strtolower($this->model->formName()), $this->template);
         } else {
             $path[] = $this->attribute;
         }
@@ -313,15 +318,19 @@ class FormField extends \yii\base\Component {
     private function addField() {
         $path     = [];
 
+        $relation = false;
         foreach ($this->form->structurePath as $key => $value) {
             $path[] = $value['formName'];
             $path[] = '_relations';
-            $path[] = $value['relation'];
+            $path[] = $relation = $value['relation'];
         }
         $structure =& $this->form->arrayPath($this->form->structure, $path);
 
-        if (!empty($this->extend))
-            $structure[$this->model->formName()][$this->attribute] = $this->extend;
+        // if (!empty($this->extend))
+        //     $structure[$this->model->formName()][$this->attribute] = $this->extend;
+        // $structure[($relation) ? $relation : $this->model->formName()][$this->attribute] = $this->extend;
+        $structure[$this->model->formName()][$this->attribute] = $this->extend;
+
     }
 
     public function create() {
