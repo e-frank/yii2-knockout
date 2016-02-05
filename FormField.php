@@ -200,7 +200,7 @@ class FormField extends \yii\base\Component {
     }
 
     public function textInput($options = []) {
-        $this->inputOptions = ArrayHelper::merge($this->inputOptions, $options)
+        $this->inputOptions = ArrayHelper::merge($this->inputOptions, $options);
         return $this;
     }
 
