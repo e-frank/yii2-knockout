@@ -7,14 +7,14 @@
     "authors": [
         {
             "name":     "Elmar Frank",
-            "homepage": "http://yii.efrank.at/extension/knockout"
+            "homepage": "http://yii.efrank.at/extensions/knockout"
         }
     ],
     "require": {
-        "yiisoft/yii2":  "*",
-        "e-frank/yii2-base": "*",
+        "yiisoft/yii2":                "*",
+        "e-frank/yii2-base":           "*",
         "e-frank/yii2-datetimepicker": "*",
-        "e-frank/yii2-moment": "*"
+        "e-frank/yii2-moment":         "*"
     },
     "autoload": {
         "psr-4": { "x1\\knockout\\": "" }

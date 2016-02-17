@@ -45,7 +45,7 @@ class KnockoutAsset extends \yii\web\AssetBundle
 
 	public $depends = [
 		'x1\base\ConfigAsset',
-		'x1\moment\MomentAsset',
+		'x1\assets\MomentAsset',
 		'yii\validators\ValidationAsset',
 	];
 
