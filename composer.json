@@ -12,7 +12,6 @@
     ],
     "require": {
         "yiisoft/yii2":                "*",
-        "bower-asset/knockout":        "3.4.0",
         "e-frank/yii2-base":           "*",
         "e-frank/yii2-datetimepicker": "*",
         "e-frank/yii2-select2":        "*",
