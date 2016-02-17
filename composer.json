@@ -14,6 +14,7 @@
         "yiisoft/yii2":                "*",
         "e-frank/yii2-base":           "*",
         "e-frank/yii2-datetimepicker": "*",
+        "e-frank/yii2-select2":        "*",
         "e-frank/yii2-moment":         "*"
     },
     "autoload": {
