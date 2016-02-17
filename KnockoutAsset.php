@@ -17,7 +17,6 @@ class KnockoutAsset extends \yii\web\AssetBundle
 	];
 
 	public $js         = [
-		'knockout.js' => 'knockout-3.4.0.js',
 		'knockout.config.js',
 		'knockout.proto.js',
 
@@ -47,6 +46,7 @@ class KnockoutAsset extends \yii\web\AssetBundle
 		'x1\base\ConfigAsset',
 		'x1\assets\moment\MomentAsset',
 		'yii\validators\ValidationAsset',
+		'x1\knockout\KnockoutJsAsset',
 	];
 
 }
