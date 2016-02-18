@@ -32,7 +32,7 @@ ko.bindingHandlers.select2 = {
 		// set current selection by id
 		this.setCurrent = function() {
 			var s2       = e.data('select2');
-			var selected = ko.utils.arrayFirst(items(), function(item) {
+			var selected = ko.utils.arrayFirst(ko.unwrap(items) || [], function(item) {
 	            return (item[idProp]) == (ko.unwrap(selectedX));
 	        });
 
