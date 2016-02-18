@@ -31,21 +31,24 @@ ko.bindingHandlers.select2 = {
 
 		// set current selection by id
 		this.setCurrent = function() {
-			var s2       = e.data('select2');
-			var selected = ko.utils.arrayFirst(ko.unwrap(items) || [], function(item) {
-	            return (item[idProp]) == (ko.unwrap(selectedX));
-	        });
+			var itms = ko.unwrap(items);
+			if (itms !== null) {
+				var s2       = e.data('select2');
+				var selected = ko.utils.arrayFirst(itms || [], function(item) {
+		            return (item[idProp]) == (ko.unwrap(selectedX));
+		        });
 
-			if (selected) {
-				var old = getData();
-				var v   = selected[idProp];
+				if (selected) {
+					var old = getData();
+					var v   = selected[idProp];
 
-				if (v !== old) {
-					s2.trigger('select', {data: selected});
-					e.trigger('change');
+					if (v !== old) {
+						s2.trigger('select', {data: selected});
+						e.trigger('change');
+					}
+				} else {
+					e.select2('val', null);
 				}
-			} else {
-				e.select2('val', null);
 			}
 		}
 
