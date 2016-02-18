@@ -40,6 +40,7 @@ class ActiveForm extends \yii\base\Widget {
     public $method           = 'POST';
     public $viewModelName    = 'viewModel';
     public $validateOnSubmit = true;
+    public $bind             = true;
 
     private $relationTag     = [];
 
@@ -103,7 +104,7 @@ EOD
             }
         }
 
-        if (!empty($w->data)) {
+        if ($w->bind) {
             $w->bind($w->data, $w->errors);
         }
 
