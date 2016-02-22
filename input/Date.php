@@ -23,9 +23,7 @@ class Date extends \yii\widgets\InputWidget {
 			'attribute' => $this->attribute,
 			'name'      => $this->name,
 			'value'     => $this->value,
-			'maxlength' => $this->maxlength,
-			'size'      => $this->size,
-			'options'   => $this->options,
+			'options'   => array_merge(array_filter(['size' => $this->size, 'maxlength' => $this->maxlength]), $this->options),
 		]);
 	}
 

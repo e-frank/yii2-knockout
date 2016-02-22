@@ -24,8 +24,7 @@ class Textarea extends \yii\widgets\InputWidget {
 			'attribute' => $this->attribute,
 			'name'      => $this->name,
 			'value'     => $this->value,
-			'rows'      => $this->rows,
-			'cols'      => $this->cols,
+			'options'   => array_merge(array_filter(['rows' => $this->rows, 'cols' => $this->cols]), $this->options),
 		]);
 	}
 

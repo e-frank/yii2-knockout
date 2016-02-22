@@ -47,7 +47,8 @@ class FormField extends \yii\base\Component {
 
 
     public function extend($extend) {
-        $this->extend($extend);
+        $this->extend = $extend;
+        return $this;
     }
 
     public function item() {
@@ -226,7 +227,7 @@ class FormField extends \yii\base\Component {
         $this->extend = ArrayHelper::merge($this->extend, [
             'textarea' => $this->getDefaults([], ['textarea'], [])
             ], $options);
-        return $this->widget(\x1\knockout\input\Textarea::className(), $options);
+        return $this->widget(\x1\knockout\input\Textarea::className(), ArrayHelper::merge(['options' => $this->inputOptions], $options));
     }
 
 
@@ -234,37 +235,45 @@ class FormField extends \yii\base\Component {
         $this->extend = ArrayHelper::merge($this->extend, [
             'datetime' => $this->getDefaults(['time' => false], ['date'], ['date' => 'format'])
             ], $options);
-        return $this->widget(\x1\knockout\input\Date::className(), $this->options);
+        return $this->widget(\x1\knockout\input\Date::className(), ArrayHelper::merge(['options' => $this->inputOptions], $options));
     }
 
     public function dateTime($options = []) {
         $this->extend = ArrayHelper::merge($this->extend, [
             'datetime' => $this->getDefaults(['time' => true], ['date'], ['date' => 'format'])
             ], $options);
-        return $this->widget(\x1\knockout\input\DateTime::className(), $this->options);
+        return $this->widget(\x1\knockout\input\DateTime::className(), ArrayHelper::merge(['options' => $this->inputOptions], $options));
     }
 
     public function decimal($options = []) {
         $this->extend = ArrayHelper::merge($this->extend, [
             'decimal' => $this->getDefaults([], ['decimals', 'thousandsSeparator', 'decimalSeparator'], [])
             ], $options);
-        return $this->widget(\x1\knockout\input\Decimal::className(), $this->options);
+        return $this->widget(\x1\knockout\input\Decimal::className(), ArrayHelper::merge(['options' => $this->inputOptions], $options));
     }
 
     public function integer($options = []) {
         $this->extend = ArrayHelper::merge($this->extend, [
             'decimal' => $this->getDefaults(['decimals' => 0], ['thousandsSeparator', 'decimalSeparator'], [])
             ], $options);
-        return $this->widget(\x1\knockout\input\Decimal::className(), $this->options);
+        return $this->widget(\x1\knockout\input\Decimal::className(), ArrayHelper::merge(['options' => $this->inputOptions], $options));
     }
     
     public function percent($options = []) {
         $this->extend = ArrayHelper::merge($this->extend, [
             'decimal' => $this->getDefaults(['decimals' => 0, 'percent' => true], ['thousandsSeparator', 'decimalSeparator'], [])
             ], $options);
-        return $this->widget(\x1\knockout\input\Percent::className(), $this->options);
+        return $this->widget(\x1\knockout\input\Percent::className(), ArrayHelper::merge(['options' => $this->inputOptions], $options));
     }
 
+
+    public function focus($focus = false) {
+        $this->extend['focus'] = $focus;
+        $bind  = ArrayHelper::getValue($this->inputOptions, 'data-bind', '');
+        $binds = [$bind, sprintf('hasFocus: %s.focus', $this->attribute)];
+        $this->inputOptions['data-bind'] = implode(', ', array_filter($binds));
+        return $this;
+    }
 
     public function fileInput($options = []) {
         return Html::activeFileInput($this->model, $this->attribute, $options);

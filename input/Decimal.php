@@ -16,6 +16,7 @@ class Decimal extends BaseDecimalInput {
 	public $size      = null;
 	public $maxlength = 15;
 
+
 	public function run() {
 		return $this->view->render('@x1/knockout/input/views/decimal/decimal', [
 			'id'        => $this->id,
@@ -23,9 +24,7 @@ class Decimal extends BaseDecimalInput {
 			'attribute' => $this->attribute,
 			'name'      => $this->name,
 			'value'     => $this->value,
-			'maxlength' => $this->maxlength,
-			'size'      => $this->size,
-			'options'   => $this->options,
+			'options'   => array_merge(array_filter(['size' => $this->size, 'maxlength' => $this->maxlength]), $this->options),
 		]);
 	}
 

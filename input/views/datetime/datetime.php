@@ -1,7 +1,7 @@
 <div class="form-inline">
 		<div class="input-group">
 			<span class="input-group-addon"><i class="fa fa-calendar"></i></span>
-			<input class="form-control" maxlength="<?= $maxlength ?>" size="<?= $size ?>" data-bind="'value': <?= $attribute ?>.display" />
+			<?= \yii\helpers\Html::tag('input', null, $options) ?>
 		</div>
 
 <? if ($time !== true) { ?>
