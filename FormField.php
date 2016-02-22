@@ -235,6 +235,7 @@ class FormField extends \yii\base\Component {
         $this->extend = ArrayHelper::merge($this->extend, [
             'datetime' => $this->getDefaults(['time' => false], ['date'], ['date' => 'format'])
             ], $options);
+        return $this->widget(\x1\knockout\input\BootstrapMaterialDatetimePicker::className(), ArrayHelper::merge(['time' => false, 'options' => $this->inputOptions, 'pickerOptions' => ['time' => false, 'autoOpen' => false]], $options));
         return $this->widget(\x1\knockout\input\Date::className(), ArrayHelper::merge(['options' => $this->inputOptions], $options));
     }
 
@@ -242,6 +243,7 @@ class FormField extends \yii\base\Component {
         $this->extend = ArrayHelper::merge($this->extend, [
             'datetime' => $this->getDefaults(['time' => true], ['date'], ['date' => 'format'])
             ], $options);
+        return $this->widget(\x1\knockout\input\BootstrapMaterialDatetimePicker::className(), ArrayHelper::merge(['time' => true, 'options' => $this->inputOptions, 'pickerOptions' => ['time' => false, 'autoOpen' => false]], $options));
         return $this->widget(\x1\knockout\input\DateTime::className(), ArrayHelper::merge(['options' => $this->inputOptions], $options));
     }
 

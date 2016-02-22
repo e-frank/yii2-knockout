@@ -11,11 +11,12 @@
         }
     ],
     "require": {
-        "yiisoft/yii2":                "*",
-        "e-frank/yii2-base":           "*",
-        "e-frank/yii2-datetimepicker": "*",
-        "e-frank/yii2-select2":        "*",
-        "e-frank/yii2-moment":         "*"
+        "yiisoft/yii2":                                    "*",
+        "e-frank/yii2-base":                               "*",
+        "e-frank/yii2-datetimepicker":                     "*",
+        "e-frank/yii2-select2":                            "*",
+        "e-frank/yii2-moment":                             "*",
+        "e-frank/yii2-bootstrap-material-datetime-picker": "*"
     },
     "autoload": {
         "psr-4": { "x1\\knockout\\": "" }

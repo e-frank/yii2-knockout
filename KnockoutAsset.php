@@ -26,6 +26,7 @@ class KnockoutAsset extends \yii\web\AssetBundle
 		'binding-handlers/knockout.bindinghandlers.fadein.js'      => 'binding-handlers/knockout.bindinghandlers.fadein.min.js',
 		'binding-handlers/knockout.bindinghandlers.hiddenvalue.js' => 'binding-handlers/knockout.bindinghandlers.hiddenvalue.min.js',
 		'binding-handlers/knockout.bindinghandlers.typeahead.js'   => 'binding-handlers/knockout.bindinghandlers.typeahead.min.js',
+		'binding-handlers/knockout.bindinghandlers.datetimepicker.js',
 		'binding-handlers/ko.binding.select2.js',
 
 		'extenders/knockout.extender.display.js'                   => 'extenders/knockout.extender.display.min.js',
