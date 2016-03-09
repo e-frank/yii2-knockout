@@ -9,6 +9,7 @@ ko.bindingHandlers.select2 = {
 		var items     = (bindings.items && ko.isObservable(bindings.items)) ? bindings.items : null;
 		var idProp    = ko.unwrap(bindings.optionsValue) || 'id';
 		var textProp  = ko.unwrap(bindings.optionsText) || 'text';
+		var current   = bindings.current;
 
 		var options  = $.extend({
 				data:  ko.unwrap(items || []), 
@@ -32,8 +33,9 @@ ko.bindingHandlers.select2 = {
 		// set current selection by id
 		this.setCurrent = function() {
 			var itms = ko.unwrap(items);
+			var s2   = e.data('select2');
+
 			if (itms !== null) {
-				var s2       = e.data('select2');
 				var selected = ko.utils.arrayFirst(itms || [], function(item) {
 		            return (item[idProp]) == (ko.unwrap(selectedX));
 		        });
@@ -48,6 +50,15 @@ ko.bindingHandlers.select2 = {
 					}
 				} else {
 					e.select2('val', null);
+				}
+			} else {
+				var selected = ko.unwrap(selectedX);
+				var old = e.val();
+				if (old !== selected) {
+					var d = ko.toJS(current);
+					// console.log('setting value', selected, old, 'data: ', getData(), current, d);
+					s2.trigger('select', {data: d});
+					e.trigger('change');
 				}
 			}
 		}
