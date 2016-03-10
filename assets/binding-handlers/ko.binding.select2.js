@@ -25,8 +25,12 @@ ko.bindingHandlers.select2 = {
 
 		this.getData = function() {
 			var s2   = e.data('select2');
-			var data = s2.data();
-			var v    = (data.length && data.length > 0) ? data[0][idProp] : null
+			var v    = null;
+			if (s2) {
+				var data = s2.data();
+				v = (data.length && data.length > 0) ? data[0][idProp] : null
+			}
+
 			return v;
 		}
 
