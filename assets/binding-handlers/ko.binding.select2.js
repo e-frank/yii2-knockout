@@ -1,5 +1,6 @@
 ko.bindingHandlers.select2 = {
 	init: function(element, valueAccessor, allBindings, viewModel, bindingContext) {
+		var self = this;
 		var e    = $(element);
 		var v    = valueAccessor();
 		var dont = false;
@@ -12,10 +13,13 @@ ko.bindingHandlers.select2 = {
 		var current   = bindings.current;
 
 		var options  = $.extend({
-				data:  ko.unwrap(items || []), 
+				// data:  ko.unwrap((items) ? items : []), 
+				data:  ko.unwrap((items) ? items : ((current) ? [ko.toJS(current)] : [])), 
 				value: ko.unwrap(selectedX)
 			}, v);
 
+
+		this.isSetting = false;
 
 		this.attachEvents = function() {
 			if (bindings.open && bindings.open == true) {
@@ -24,8 +28,8 @@ ko.bindingHandlers.select2 = {
 		}
 
 		this.getData = function() {
-			var s2   = e.data('select2');
-			var v    = null;
+			var v  = null;
+			var s2 = e.data('select2');
 			if (s2) {
 				var data = s2.data();
 				v = (data.length && data.length > 0) ? data[0][idProp] : null
@@ -35,8 +39,8 @@ ko.bindingHandlers.select2 = {
 		}
 
 		// set current selection by id
-		this.setCurrent = function() {
-			var itms = ko.unwrap(items);
+		this.setCurrentItems = function() {
+			var itms = ko.unwrap(items) || null;
 			var s2   = e.data('select2');
 
 			if (itms !== null) {
@@ -55,15 +59,6 @@ ko.bindingHandlers.select2 = {
 				} else {
 					e.select2('val', null);
 				}
-			} else {
-				var selected = ko.unwrap(selectedX);
-				var old = e.val();
-				if (old !== selected) {
-					var d = ko.toJS(current);
-					// console.log('setting value', selected, old, 'data: ', getData(), current, d);
-					s2.trigger('select', {data: d});
-					e.trigger('change');
-				}
 			}
 		}
 
@@ -72,6 +67,11 @@ ko.bindingHandlers.select2 = {
 		ko.utils.domNodeDisposal.addDisposeCallback(element, function() {
     		e.select2('destroy');
   		});
+
+
+		e.select2(options);
+		setCurrentItems();
+		attachEvents();
 
 
 		// rebuild data on changed items
@@ -83,41 +83,93 @@ ko.bindingHandlers.select2 = {
 
 				options.data = ko.unwrap(items || []);
 				e.select2(options);
-				setCurrent();
+				setCurrentItems();
 				if (isOpen)
 					e.select2('open');
 			});
 		}
 
-		e.select2(options);
-		setCurrent();
-		attachEvents();
 
-
-		// listen to changed event
 		if (selectedX) {
-			if (ko.isObservable(selectedX)) {
-				this.changed = function(ev) {
-					var v = getData();
-					var o = selectedX();
-					if (o !== v)
-						selectedX(v);
+
+			// listen to changed event
+			if (!current) {
+				if (ko.isObservable(selectedX)) {
+					this.changed = function(ev) {
+						var v = getData();
+						var o = selectedX();
+						if (o !== v)
+							selectedX(v);
+					}
+				} else {
+					this.changed = function(ev) {
+						var v     = getData();
+						selectedX = v;
+					}
 				}
-			} else {
-				this.changed = function(ev) {
-					var v     = getData();
-					selectedX = v;
-				}
+
+				e.on('change', this.changed)
 			}
 
-			e.on('change', changed)
 		}
 
+
+
+
 		// if selected value has changed, update select2
-		if (selectedX && ko.isObservable(selectedX)) {
-			selectedX.subscribe(function(newvalue) {
-				setCurrent();
+		if (ko.isObservable(current)) {
+
+			// triggering selection
+	        e.on('select2:select', function(ev) {
+	        	var data = ev.params.data;
+
+	        	if (ko.isWriteableObservable(current)) {
+	        		if (self.isSetting == false) {
+	        			self.isSetting = true;
+		            	current(data);
+	        			self.isSetting = false;
+	        		}
+	        	} else {
+	        		if (ko.isObservable(selectedX)) {
+	        			if (ko.isWriteableObservable(selectedX)) {
+	        				selectedX(data);
+	        			}
+	        		} else {
+	        			selectedX = data;
+	        		}
+	        	}
+	        });
+
+			current.subscribe(function(v) {
+				if (self.isSetting == false) {
+					self.isSetting = true;
+					var s2         = e.data('select2');
+					var selected   = ko.toJS(current) || {};
+
+					selected[idProp]   = selected[idProp] || '';
+					selected[textProp] = selected[textProp] || '';
+
+					if (selectedX) {
+						if (ko.isWriteableObservable(selectedX)) {
+							selectedX(selected[idProp]);
+						} else {
+							if (!ko.isObservable(selectedX)) {
+								selectedX = selected[idProp];
+							}
+						}
+					}
+
+					s2.trigger('select', { data: selected });
+					e.trigger('change');
+					self.isSetting = false;
+				}
 			});
+		} else {
+			if (ko.isObservable(selectedX)) {
+				selectedX.subscribe(function(newvalue) {
+					setCurrentItems();
+				});
+			}
 		}
 
 

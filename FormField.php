@@ -28,6 +28,7 @@ class FormField extends \yii\base\Component {
     public $labelOptions  = ['class'  => 'control-label'];
     public $hintOptions   = ['class'  => 'hint-block'];
     public $parts         = [];
+    public $wrapper       = true;
 
     private $prefix = null;
 
@@ -105,7 +106,7 @@ class FormField extends \yii\base\Component {
             $content = call_user_func($content, $this);
         }
 
-        return empty($content) ? '' : $this->begin() . "\n" . $content . "\n" . $this->end();
+        return empty($content) ? '' : ($this->wrapper ? ($this->begin() . "\n" . $content . "\n" . $this->end()) : $content);
     }
 
     public function init() {
@@ -219,6 +220,7 @@ class FormField extends \yii\base\Component {
     }
 
     public function hiddenInput($options = []) {
+        $this->wrapper  = false;
         $this->template = "{hidden}";
         return $this;
     }
