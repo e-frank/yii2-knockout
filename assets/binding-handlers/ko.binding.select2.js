@@ -18,7 +18,6 @@ ko.bindingHandlers.select2 = {
 				value: ko.unwrap(selectedX)
 			}, v);
 
-
 		this.isSetting = false;
 
 		this.attachEvents = function() {
@@ -80,9 +79,10 @@ ko.bindingHandlers.select2 = {
 				var isOpen = e.data('select2').isOpen()
 				// e.select2('destroy');
 				e.empty();
-
+				var oldval = e.val();
 				options.data = ko.unwrap(items || []);
 				e.select2(options);
+				e.val(oldval);
 				setCurrentItems();
 				if (isOpen)
 					e.select2('open');
@@ -107,6 +107,7 @@ ko.bindingHandlers.select2 = {
 						selectedX = v;
 					}
 				}
+
 
 				e.on('change', this.changed)
 			}
