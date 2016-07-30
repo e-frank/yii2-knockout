@@ -172,6 +172,7 @@ class FormField extends \yii\base\Component {
         if (empty($options['data-bind'])) {
             $options['data-bind'] = sprintf('value: %1$s', $this->attribute);
         }
+        $options['name'] = '';
 
         Html::addCssClass($options, 'form-control');
         $this->parts['{input}'] = Html::activeDropDownList($this->model, $this->attribute, $items, $options);
