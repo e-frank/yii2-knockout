@@ -1,4 +1,4 @@
-<?
+<?php
 namespace x1\knockout;
 
 use Yii;
@@ -315,6 +315,15 @@ class FormField extends \yii\base\Component {
         $tag                   = ArrayHelper::remove($options, 'tag', 'div');
         $this->parts['{hint}'] = Html::tag($tag, $content, $options);
 
+        return $this;
+    }
+
+
+    public function placeholder()
+    {
+        $this->parts['{label}'] = '';
+        $this->inputOptions['placeholder'] = $this->model->getAttributeLabel($this->attribute);
+        
         return $this;
     }
 
