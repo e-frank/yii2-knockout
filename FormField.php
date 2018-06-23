@@ -233,8 +233,25 @@ class FormField extends \yii\base\Component {
         return $this->widget(\x1\knockout\input\Textarea::className(), ArrayHelper::merge(['options' => $this->inputOptions], $options));
     }
 
+    public function toggle($options = []) {
+        $this->noHidden();
+        $this->parts['{label}'] = '';
+        $this->extend = ArrayHelper::merge($this->extend, [], $options);
+
+        // $this->parts['{hidden}'] = sprintf('<input type="hidden" data-bind="value: %s, attr:{name:\'%s\'}" />', $this->attribute, $hidden);
+
+        $this->inputOptions['data-bind'] = sprintf('value: %s, attr:{name:\'%$s\',id:\'%$s\'}', $this->attribute, Html::getInputName($this->model, $this->attribute), Html::getInputId($this->model, $this->attribute));
+        return $this->widget(\x1\knockout\input\Toggle::className(), ArrayHelper::merge(['options' => $this->inputOptions], $options));
+    }
+
 
     public function date($options = []) {
+        $this->extend = ArrayHelper::merge($this->extend, [
+            ], $options);
+        return $this->widget(\x1\knockout\input\Date::className(), ArrayHelper::merge(['options' => $this->inputOptions], $options));
+    }
+
+    public function datePicker($options = []) {
         $this->extend = ArrayHelper::merge($this->extend, [
             'datetime' => $this->getDefaults(['time' => false], ['date'], ['date' => 'format'])
             ], $options);
