@@ -1,4 +1,4 @@
-<?
+<?php
 namespace x1\knockout\input;
 
 use Yii;
@@ -82,5 +82,3 @@ abstract class BaseDecimalInput extends \yii\widgets\InputWidget {
 	}
 
 }
-
-?>

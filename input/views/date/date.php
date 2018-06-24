@@ -11,11 +11,18 @@ if (empty($model) || empty($attribute)) {
 }
 ?>
 
-<!-- 			<span class="input-group-addon" data-bind="click: <?= $attribute ?>.current">
-				<a href="javascript: false;" class="text-primary" ><i class="fa fa-clock-o"></i>OO</a>
+			<span class="input-group-append">
+				<?php if ($clear) { ?>
+				<div class="input-group-text text-danger" data-bind="click: function(vm, e) { $(e.target).closest('div.input-group').find('input[type=date]').val(null); return false; }">
+					<i class="fa fa-times"></i>
+				</div>
+				<?php } ?>
+				<?php if ($current) { ?>
+				<div class="input-group-text text-primary" data-bind="click: function(vm, e) { $(e.target).closest('div.input-group').find('input[type=date]').val((new Date()).toISOString().split('T')[0]); return false; }">
+					<i class="fa fa-clock"></i>
+				</div>
+				<?php } ?>
 			</span>
- -->
 
-<code data-bind="text: startdate"></code>
 		</div>
 </div>

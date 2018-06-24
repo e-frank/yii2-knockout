@@ -1,4 +1,4 @@
-<?
+<?php
 namespace x1\knockout\input;
 
 use Yii;
@@ -31,4 +31,3 @@ class DateTime extends \yii\widgets\InputWidget {
 
 }
 
-?>

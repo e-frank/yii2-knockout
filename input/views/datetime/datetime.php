@@ -6,16 +6,16 @@
 			<?= \yii\helpers\Html::tag('input', null, $options) ?>
 		</div>
 
-<? if ($time !== true) { ?>
+<?php if ($time !== true) { ?>
 		<select class="form-control" data-bind="options: <?= $attribute ?>.hours, optionsValue: 'key', optionsText: 'value', optionsCaption: '-', value: <?= $attribute ?>.hour"></select>
-<? } ?>
+<?php } ?>
 
 		<div class="input-group">
-<? if ($time == true) { ?>
+<?php if ($time == true) { ?>
 		<select class="form-control" data-bind="options: <?= $attribute ?>.times, optionsCaption: '-', value: <?= $attribute ?>.time"></select>
-<? } else { ?>
+<?php } else { ?>
 		<select class="form-control" data-bind="options: <?= $attribute ?>.minutes, optionsValue: 'key', optionsText: 'value', optionsCaption: '-', value: <?= $attribute ?>.minute"></select>
-<? } ?>
+<?php } ?>
 			<span class="input-group-addon" data-bind="click: <?= $attribute ?>.clear">
 				<a href="javascript: false;" class="text-danger" ><i class="fa fa-remove"></i></a>
 			</span>

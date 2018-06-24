@@ -22,6 +22,7 @@ class KnockoutAsset extends \yii\web\AssetBundle
 		'knockout.config.js',
 		'knockout.proto.js',
 
+		'binding-handlers/knockout.bindinghandlers.initial.js'     => 'binding-handlers/knockout.bindinghandlers.initial.js',
 		'binding-handlers/knockout.bindinghandlers.checkbox.js'    => 'binding-handlers/knockout.bindinghandlers.checkbox.min.js',
 		'binding-handlers/knockout.bindinghandlers.fadein.js'      => 'binding-handlers/knockout.bindinghandlers.fadein.min.js',
 		'binding-handlers/knockout.bindinghandlers.hiddenvalue.js' => 'binding-handlers/knockout.bindinghandlers.hiddenvalue.min.js',

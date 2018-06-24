@@ -1,4 +1,4 @@
-<?
+<?php
 namespace x1\knockout\input;
 
 use Yii;
@@ -28,5 +28,3 @@ class Percent extends BaseDecimalInput {
 	}
 
 }
-
-?>

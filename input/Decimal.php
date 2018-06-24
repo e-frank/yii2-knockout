@@ -1,4 +1,4 @@
-<?
+<?php
 namespace x1\knockout\input;
 
 use Yii;
@@ -29,5 +29,3 @@ class Decimal extends BaseDecimalInput {
 	}
 
 }
-
-?>

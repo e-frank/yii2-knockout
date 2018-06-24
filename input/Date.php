@@ -1,4 +1,4 @@
-<?
+<?php
 namespace x1\knockout\input;
 
 use Yii;
@@ -15,6 +15,8 @@ class Date extends \yii\widgets\InputWidget {
 
 	public $size      = null;
 	public $maxlength = 10;
+	public $clear     = true;
+	public $current   = true;
 
 	public function run() {
 		return $this->view->render('@x1/knockout/input/views/date/date', [
@@ -23,10 +25,10 @@ class Date extends \yii\widgets\InputWidget {
 			'attribute' => $this->attribute,
 			'name'      => $this->name,
 			'value'     => $this->value,
+			'clear'     => $this->clear,
+			'current'   => $this->current,
 			'options'   => array_merge(array_filter(['type' => 'date', 'size' => $this->size, 'maxlength' => $this->maxlength]), $this->options),
 		]);
 	}
 
 }
-
-?>
