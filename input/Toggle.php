@@ -13,7 +13,8 @@ use yii\helpers\Url;
 class Toggle extends \yii\widgets\InputWidget {
 	public static $autoIdPrefix = 'x1Toggle';
 
-	public $size = '';
+	public $size  = '';
+	public $label = null;
 
 	public function run() {
 		$this->options['type'] = 'checkbox';
@@ -27,6 +28,7 @@ class Toggle extends \yii\widgets\InputWidget {
 			'name'      => $this->name,
 			'value'     => $this->value,
 			'size'      => $this->size,
+			'label'     => $this->label,
 			'options'   => array_merge(array_filter([]), $this->options),
 		]);
 	}

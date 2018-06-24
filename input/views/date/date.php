@@ -5,9 +5,9 @@
 			</div>
 <?php
 if (empty($model) || empty($attribute)) {
-	echo \yii\helpers\Html::input('text', $name, $value, $options + ['id' => $id]);
+	echo \yii\helpers\Html::input('date', $name, $value, array_merge($options, ['id' => $id]));
 } else {
-	echo \yii\helpers\Html::activeTextInput($model, $attribute, $options + ['id' => $id]);
+	echo \yii\helpers\Html::activeTextInput($model, $attribute, array_merge($options, ['id' => $id]));
 }
 ?>
 
@@ -15,5 +15,7 @@ if (empty($model) || empty($attribute)) {
 				<a href="javascript: false;" class="text-primary" ><i class="fa fa-clock-o"></i>OO</a>
 			</span>
  -->
+
+<code data-bind="text: startdate"></code>
 		</div>
 </div>

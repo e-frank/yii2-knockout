@@ -31,6 +31,7 @@ class FormField extends \yii\base\Component {
     public $wrapper       = true;
 
     private $prefix = null;
+    private $label  = null;
 
     private function getPath() {
 
@@ -236,18 +237,20 @@ class FormField extends \yii\base\Component {
     public function toggle($options = []) {
         $this->noHidden();
         $this->parts['{label}'] = '';
-        $this->extend = ArrayHelper::merge($this->extend, [], $options);
-
-        // $this->parts['{hidden}'] = sprintf('<input type="hidden" data-bind="value: %s, attr:{name:\'%s\'}" />', $this->attribute, $hidden);
-
-        $this->inputOptions['data-bind'] = sprintf('value: %s, attr:{name:\'%$s\',id:\'%$s\'}', $this->attribute, Html::getInputName($this->model, $this->attribute), Html::getInputId($this->model, $this->attribute));
-        return $this->widget(\x1\knockout\input\Toggle::className(), ArrayHelper::merge(['options' => $this->inputOptions], $options));
+        // $this->extend           = ArrayHelper::merge($this->extend, [], $options);
+        $this->inputOptions['data-bind'] = sprintf('checked: %s, attr:{name:\'%s\',id222:\'%s\'}', $this->attribute, Html::getInputName($this->model, $this->attribute), Html::getInputId($this->model, $this->attribute));
+        $this->inputOptions['value']     = $this->model->{$this->attribute};
+        $this->inputOptions['value']     = ArrayHelper::getValue($options, 'value', "1");
+        return $this->widget(\x1\knockout\input\Toggle::className(), ArrayHelper::merge(['label' => $this->label, 'options' => $this->inputOptions], $options));
     }
 
 
     public function date($options = []) {
+        $this->noHidden();
         $this->extend = ArrayHelper::merge($this->extend, [
             ], $options);
+        $this->inputOptions['data-bind'] = sprintf('hiddenValue: %1$s, attr:{name:\'%2$s\'}', $this->attribute, Html::getInputName($this->model, $this->attribute));
+        $this->inputOptions['value']     = $this->model->{$this->attribute};
         return $this->widget(\x1\knockout\input\Date::className(), ArrayHelper::merge(['options' => $this->inputOptions], $options));
     }
 
@@ -311,6 +314,7 @@ class FormField extends \yii\base\Component {
    
     public function label($label = null, $options = [])
     {
+        $this->label = $label;
         if ($label === false) {
             $this->parts['{label}'] = '';
             return $this;
@@ -336,10 +340,10 @@ class FormField extends \yii\base\Component {
     }
 
 
-    public function placeholder()
+    public function placeholder($placeholder = null)
     {
         $this->parts['{label}'] = '';
-        $this->inputOptions['placeholder'] = $this->model->getAttributeLabel($this->attribute);
+        $this->inputOptions['placeholder'] = empty($placeholder) ? (empty($this->label) ? $this->model->getAttributeLabel($this->attribute) : $this->label) : $placeholder;
         
         return $this;
     }
