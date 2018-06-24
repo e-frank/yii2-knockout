@@ -1,4 +1,4 @@
-<?
+<?php
 namespace x1\knockout\helpers;
 
 class DateFormatConverter {

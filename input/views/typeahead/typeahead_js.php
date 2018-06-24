@@ -35,7 +35,7 @@ $('#<?= $id ?>').typeahead(null, {
 	source:     bloodhound.<?= $id ?>.ttAdapter(),
 	templates:  {
 		empty: <?= Json::encode(sprintf('<div class="tt-empty">%s</div>', $empty)) ?>
-		<? if (!empty($suggestion)) { echo sprintf(',suggestion: Handlebars.compile(%s)', Json::encode($suggestion)); } ?>
+		<?php if (!empty($suggestion)) { echo sprintf(',suggestion: Handlebars.compile(%s)', Json::encode($suggestion)); } ?>
 	}
 }).bind('typeahead:selected typeahead:autocompleted', <?= Json::encode($selected) ?>);
 
@@ -63,7 +63,7 @@ $('#<?= $id ?>').typeahead(null, {
 });
 */
 
-<?
+<?php
 	$this->endCache();
 }
 ?>

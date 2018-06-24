@@ -68,12 +68,12 @@ var_dump([
 
 ?>
 
-<? $form = ActiveForm::begin(['errors' => $model->getErrors(), 'defaults' => ['decimals' => 3]]); ?>
+<?php $form = ActiveForm::begin(['errors' => $model->getErrors(), 'defaults' => ['decimals' => 3]]); ?>
 <div class="panel panel-default">
     <div class="panel-heading"><?= $this->title ?></div>
     <div class="panel-body">
 		<?= $form->field($model, 'title') ?>
-		<?#= $form->field($model, 'value')->decimal(['decimal' => ['thousandsSeparator' => ' ']]) ?>
+		<?php #= $form->field($model, 'value')->decimal(['decimal' => ['thousandsSeparator' => ' ']]) ?>
 		<?= $form->field($model, 'value')->decimal() ?>
 		computed raw data: <code data-bind="text: comp" class="text-right"></code>
 		computed user's display format: <code data-bind="text: comp.display" class="text-right"></code>
@@ -96,7 +96,7 @@ var_dump([
 		</div>
 	</div>
 </div>
-<? ActiveForm::end() ?>
+<?php ActiveForm::end() ?>
 ```
 
 
