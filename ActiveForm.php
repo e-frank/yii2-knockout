@@ -1,4 +1,4 @@
-<?
+<?php
 namespace x1\knockout;
 
 use Yii;

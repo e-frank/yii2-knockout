@@ -235,20 +235,24 @@ class FormField extends \yii\base\Component {
     }
 
     public function toggle($options = []) {
-        $this->noHidden();
+        $trueValue              = ArrayHelper::getValue($options, 'trueValue', 1);
+        $falseValue             = ArrayHelper::getValue($options, 'falseValue', 0);
+        $value                  = ArrayHelper::getValue($options, 'value', $this->model->{$this->attribute});
         $this->parts['{label}'] = '';
-        // $this->extend           = ArrayHelper::merge($this->extend, [], $options);
-        $this->inputOptions['data-bind'] = sprintf('checked: %s, attr:{name:\'%s\',id222:\'%s\'}', $this->attribute, Html::getInputName($this->model, $this->attribute), Html::getInputId($this->model, $this->attribute));
-        $this->inputOptions['value']     = $this->model->{$this->attribute};
-        $this->inputOptions['value']     = ArrayHelper::getValue($options, 'value', "1");
+
+        $this->extend = ArrayHelper::merge($this->extend, [
+            'bool' => $this->getDefaults(['trueValue' => $trueValue, 'falseValue' => $falseValue], [], [])
+            ], array_diff_key($options, ['value' => null, 'trueValue' => null]));
+
+        $this->inputOptions['data-bind'] = sprintf('checkbox: %s.bool, initial: %1$s, checkedValue: %s', $this->attribute, Json::encode($trueValue));
+
         return $this->widget(\x1\knockout\input\Toggle::className(), ArrayHelper::merge(['label' => $this->label, 'options' => $this->inputOptions], $options));
     }
 
 
     public function date($options = []) {
         $this->noHidden();
-        $this->extend = ArrayHelper::merge($this->extend, [
-            ], $options);
+        $this->extend = ArrayHelper::merge($this->extend, [], array_diff_key($options, ['clear' => null, 'current' => null, ]));
         $this->inputOptions['data-bind'] = sprintf('hiddenValue: %1$s, attr:{name:\'%2$s\'}', $this->attribute, Html::getInputName($this->model, $this->attribute));
         $this->inputOptions['value']     = $this->model->{$this->attribute};
         return $this->widget(\x1\knockout\input\Date::className(), ArrayHelper::merge(['options' => $this->inputOptions], $options));
