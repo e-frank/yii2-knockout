@@ -139,8 +139,7 @@ class FormField extends \yii\base\Component {
 
         }
 
-        $this->parts['{error}'] = sprintf('<!-- ko if: %1$s && %1$s.errors --><div class="help-block"><ul class="list-unstyled" data-bind="foreach: %1$s.errors"><li data-bind="text: $data"></li></ul></div><!-- /ko -->', $this->attribute);
-
+        $this->parts['{error}']      = sprintf('<!-- ko if: %1$s && %1$s.errors --><div class="help-block"><ul class="list-unstyled" data-bind="foreach: %1$s.errors"><li data-bind="text: $data"></li></ul></div><!-- /ko -->', $this->attribute);
         $this->inputOptions['value'] = '';
         $this->inputOptions['id']    = '';
         if (empty($this->inputOptions['data-bind'])) {
@@ -263,7 +262,6 @@ class FormField extends \yii\base\Component {
             'datetime' => $this->getDefaults(['time' => false], ['date'], ['date' => 'format'])
             ], $options);
         return $this->widget(\x1\knockout\input\BootstrapMaterialDatetimePicker::className(), ArrayHelper::merge(['time' => false, 'options' => $this->inputOptions, 'pickerOptions' => ['time' => false, 'autoOpen' => false]], $options));
-        return $this->widget(\x1\knockout\input\Date::className(), ArrayHelper::merge(['options' => $this->inputOptions], $options));
     }
 
     public function dateTime($options = []) {
@@ -271,7 +269,6 @@ class FormField extends \yii\base\Component {
             'datetime' => $this->getDefaults(['time' => true], ['date'], ['date' => 'format'])
             ], $options);
         return $this->widget(\x1\knockout\input\BootstrapMaterialDatetimePicker::className(), ArrayHelper::merge(['time' => true, 'options' => $this->inputOptions, 'pickerOptions' => ['time' => false, 'autoOpen' => false]], $options));
-        return $this->widget(\x1\knockout\input\DateTime::className(), ArrayHelper::merge(['options' => $this->inputOptions], $options));
     }
 
     public function decimal($options = []) {

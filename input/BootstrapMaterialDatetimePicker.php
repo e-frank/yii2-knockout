@@ -21,7 +21,7 @@ class BootstrapMaterialDatetimePicker extends \yii\widgets\InputWidget {
 	public function run() {
 
 		// $this->view->registerCssFile('https://fonts.googleapis.com/icon?family=Material+Icons');
-		$this->view->registerCssFile('https://fonts.googleapis.com/icon?family=Material+Icons|Ubuntu|Ubuntu+Mono');
+		$this->view->registerCssFile('https://fonts.googleapis.com/icon?family=Material+Icons');
 
 		\x1\assets\BootstrapMaterialDatetimePicker\BootstrapMaterialDatetimePickerAsset::register($this->view);
 
