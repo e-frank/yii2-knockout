@@ -6,7 +6,7 @@ ko.bindingHandlers.datetimepicker = {
 
         var v = allBindings.get('value');
         v.open = function(e) {
-            picker._onFocus();
+            picker._fireCalendar();
         }
     },
 };
